@@ -609,7 +609,7 @@ fixmes = {
 }
 
 def do_mapfile(src, dest, fix_offset):
-    map = [x.strip() for x in open(src, 'r')]
+    map = [x.rstrip() for x in open(src, 'r')]
     new = []
 
     for line in map:
@@ -689,7 +689,7 @@ def do_module(src, dest):
     if 'hooks' not in m:
         return
 
-    for id, func in fix_for.iteritems():
+    for id, func in fix_for.items():
         for hook in m['hooks']:
             work_on_hook(hook, id, func)
 
