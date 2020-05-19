@@ -69,7 +69,7 @@ class DyLinkCreator:
             else:
                 sect.in_blob = False
 
-        self.code = ''.join(code_bits)
+        self.code = b''.join(code_bits)
 
     def _process_symbols(self):
         sym_section = self.elf.get_section_by_name('.symtab')

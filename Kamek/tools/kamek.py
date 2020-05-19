@@ -442,8 +442,8 @@ class KamekBuilder:
         p = subprocess.Popen(gcc_type + '-c++filt', stdin=subprocess.PIPE, stdout=subprocess.PIPE)
 
         symbolNameList = [sym[1] for sym in self._symbols]
-        filtResult = p.communicate('\n'.join(symbolNameList))
-        filteredSymbols = filtResult[0].split('\n')
+        filtResult = p.communicate('\n'.join(symbolNameList).encode())
+        filteredSymbols = filtResult[0].decode().split('\n')
 
         for sym, filt in zip(self._symbols, filteredSymbols):
             sym.append(filt)
