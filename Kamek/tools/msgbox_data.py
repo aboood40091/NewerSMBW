@@ -1,18 +1,21 @@
 messages = [
-		# Message 0
-		(0x100, 'A Test Message',
-			'This is a test message.\nWith some lines.\nAnd more lines.\nAnd a really long line to see if nw4r::lyt can handle wrapping or not...\nFinal line.'
-			),
-		]
+    # Message 0
+    (0x100, 'A Test Message',
+            'This is a test message.\nWith some lines.\nAnd more lines.\nAnd a really long line to see if nw4r::lyt can handle wrapping or not...\nFinal line.'
+    ),
+]
 
-import struct, sys, os.path, codecs
+import struct
+import sys
+import os.path
+import codecs
 
 if len(sys.argv) > 1:
-	target = sys.argv[1]
+    target = sys.argv[1]
 elif os.path.exists('/home/me/Games/Newer'):
-	target = '/home/me/Games/Newer/ISO/files/NewerRes/Messages.bin'
+    target = '/home/me/Games/Newer/ISO/files/NewerRes/Messages.bin'
 else:
-	target = 'Messages.bin'
+    target = 'Messages.bin'
 
 messageCount = len(messages)
 
@@ -23,14 +26,13 @@ headerData = bytearray(struct.pack('>I', messageCount))
 stringData = bytearray()
 
 for msgID, title, msg in messages:
-	titleOffset = stringOffset + len(stringData)
-	stringData += codecs.utf_16_be_encode(title)[0] + '\0\0'
-	msgOffset = stringOffset + len(stringData)
-	stringData += codecs.utf_16_be_encode(msg)[0] + '\0\0'
+    titleOffset = stringOffset + len(stringData)
+    stringData += title.encode('utf-16be') + b'\0\0'
+    msgOffset = stringOffset + len(stringData)
+    stringData += msg.encode('utf-16be') + b'\0\0'
 
-	headerData += infoStruct.pack(msgID, titleOffset, msgOffset)
+    headerData += infoStruct.pack(msgID, titleOffset, msgOffset)
 
 with open(target, 'wb') as out:
-	out.write(headerData)
-	out.write(stringData)
-
+    out.write(headerData)
+    out.write(stringData)
