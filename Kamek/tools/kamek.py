@@ -109,7 +109,7 @@ def generate_ocarina_patch(destOffset, data):
 
     sourceOffset = 0
     destOffset -= 0x80000000
-    for i in xrange(count >> 2):
+    for i in range(count >> 2):
         out.append('%08X %s' % (destOffset | 0x4000000, binascii.hexlify(data[sourceOffset:sourceOffset+4])))
         sourceOffset += 4
         destOffset += 4

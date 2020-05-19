@@ -25,7 +25,7 @@ def read_class_name(idx, name):
         ns_elem_ct = int(name[idx + 1])
         ns_elems = []
         idx += 2
-        for i in xrange(ns_elem_ct):
+        for i in range(ns_elem_ct):
             idx, n = read_vl_string(idx, name)
             ns_elems.append(n)
         return idx, ns_elems
