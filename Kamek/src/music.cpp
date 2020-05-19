@@ -40,11 +40,11 @@ const char* SongNameList [] = {
 	"SEWER",
 	"SPACE",
 	"BOWSER",
-	"BONUS",	
-	"AMBUSH",	
-	"BRIDGE_DRUMS",	
-	"SNOW2",	
-	"MINIMEGA",	
+	"BONUS",
+	"AMBUSH",
+	"BRIDGE_DRUMS",
+	"SNOW2",
+	"MINIMEGA",
 	"CLIFFS",
 	"AUTUMN",
 	"CRYSTALCAVES",
@@ -79,7 +79,7 @@ const char* SongNameList [] = {
 	"",
 	"BOSS_CASTLE",
 	"BOSS_AIRSHIP",
-	NULL	
+	NULL
 };
 
 
@@ -170,7 +170,7 @@ void FixFilesize(u32 streamNameOffset) {
 
 	s32 entryNum;
 	DVDHandle info;
-	
+
 	if ((entryNum = DVDConvertPathToEntrynum(nameWithSound)) >= 0) {
 		if (DVDFastOpen(entryNum, &info)) {
 			u32 *lengthPtr = (u32*)(streamName - 0x1C);
@@ -187,7 +187,8 @@ extern "C" u8 after_course_getMusicForZone(u8 realThemeID) {
 		return realThemeID;
 
 	bool usesDrums = (realThemeID >= 200);
-	return hijackMusicWithSongName(SongNameList[realThemeID-100], realThemeID, true, usesDrums?4:2, usesDrums?2:1, 0);
+	const char *name = SongNameList[realThemeID - (usesDrums ? 200 : 100)];
+	return hijackMusicWithSongName(name, realThemeID, true, usesDrums?4:2, usesDrums?2:1, 0);
 }
 
 
