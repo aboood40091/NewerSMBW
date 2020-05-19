@@ -205,7 +205,7 @@ class KamekBuilder:
 
             # hook setup
             self._hook_contexts = {}
-            for name, hookType in hooks.HookTypes.iteritems():
+            for name, hookType in hooks.HookTypes.items():
                 if hookType.has_context:
                     self._hook_contexts[hookType] = hookType.context_type()
 
@@ -218,7 +218,7 @@ class KamekBuilder:
             else:
                 self._multi_build = {self._config['short_name']: self._config['linker_script']}
 
-            for s_name, s_script in self._multi_build.iteritems():
+            for s_name, s_script in self._multi_build.items():
                 self.current_build_name = s_name
 
                 self._patches = []
