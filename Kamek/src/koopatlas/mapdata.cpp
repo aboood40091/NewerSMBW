@@ -158,7 +158,7 @@ bool dKPMapData_c::loadTilesets() {
 	bool result = true;
 
 	for (int i = 0; i < data->tilesetCount; i++) {
-		char *filename = ((char*)data) + (data->tilesets[i].val[3] - 0x10000000);
+		char *filename = ((char*)data) + (data->tilesets[i].dummy[3] - 0x10000000);
 		void *heap = (i < 9) ? mHeap::gameHeaps[2] : mHeap::archiveHeap;
 		result &= (tilesetLoaders[i].load(filename, 0, heap) != 0);
 	}
@@ -167,7 +167,7 @@ bool dKPMapData_c::loadTilesets() {
 		tilesetsLoaded = true;
 
 		for (int i = 0; i < data->tilesetCount; i++) {
-			data->tilesets[i].val[3] = (((u32)tilesetLoaders[i].buffer & ~0xC0000000) >> 5);
+			data->tilesets[i].dummy[3] = (((u32)tilesetLoaders[i].buffer & ~0xC0000000) >> 5);
 		}
 	}
 

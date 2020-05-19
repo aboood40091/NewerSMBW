@@ -90,7 +90,7 @@ int dWMMap_c::onCreate() {
 		launchStarModel.bindAnim(&launchStarAnm);
 
 		launchStarMatrix.translation(launchStarX, launchStarY, 1000.0f);
-		S16Vec lsRot = {0x2000, s16(lsRotate ? 0x6200 : -0x5C00), 0};
+		S16Vec lsRot = {0x2000, lsRotate ? 0x6200 : -0x5C00, 0};
 		launchStarMatrix.applyRotationYXZ(&lsRot.x, &lsRot.y, &lsRot.z);
 	}
 
@@ -183,8 +183,7 @@ void dWMMap_c::renderer_c::drawLayers() {
 
 		TileReport("Checking layer %d with type %d\n", iLayer, layer->type);
 
-		GXColor whichCol = (GXColor){255,255,255,layer->alpha};
-		GXSetTevColor(GX_TEVREG0, whichCol);
+		GXSetTevColor(GX_TEVREG0, (GXColor){255,255,255,layer->alpha});
 
 		if (layer->type == dKPLayer_s::OBJECTS) 	
 			renderTileLayer(layer, data->sectors);
@@ -225,12 +224,12 @@ void dWMMap_c::renderer_c::beginRendering() {
 
 	GXSetNumIndStages(0);
 	for (int i = 0; i < 0x10; i++)
-		GXSetTevDirect(i);
+		GXSetTevDirect((GXTevStageID)i);
 
 	GXSetNumChans(0);
 	GXSetNumTexGens(1);
 
-	GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_DTTIDENTITY);
+	GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
 
 	GXSetNumTevStages(1);
 	GXSetNumIndStages(0);
@@ -482,8 +481,7 @@ void dWMMap_c::renderer_c::renderDoodadLayer(dKPLayer_s *layer) {
 			MTXConcat(doodadMtx, rotMtx, doodadMtx);
 		}
 
-		GXColor whichCol = (GXColor){255,255,255,u8(effectiveAlpha)};
-		GXSetTevColor(GX_TEVREG0, whichCol);
+		GXSetTevColor(GX_TEVREG0, (GXColor){255,255,255,effectiveAlpha});
 
 		loadCamera(doodadMtx);
 		loadTexture(doodad->texObj);

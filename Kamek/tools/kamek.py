@@ -6,7 +6,7 @@
 
 # Requires PyYAML and pyelftools
 
-version_str = 'Kamek 0.4 by Treeki'
+version_str = 'Kamek 0.4 by Treeki - Updated By AboodXD'
 
 import binascii
 import os
@@ -25,31 +25,39 @@ u32 = struct.Struct('>I')
 
 verbose = True
 use_rels = True
-use_clang = False
+use_mw = False
+use_wine = False
+mw_path = ''
 gcc_path = ''
 gcc_type = 'powerpc-eabi'
-llvm_path = ''
 show_cmd = False
 delete_temp = True
 override_config_file = None
 only_build = None
+fast_hack = False
 
 
 def parse_cmd_options():
-    global use_rels, show_cmd, delete_temp, only_build
-    global override_config_file, gcc_type, gcc_path, use_clang, llvm_path
+    global use_rels, use_mw, use_wine, show_cmd, delete_temp, only_build, fast_hack
+    global override_config_file, gcc_type, gcc_path, mw_path
 
     if '--no-rels' in sys.argv:
         use_rels = False
 
-    if '--use-clang' in sys.argv:
-        use_clang = True
+    if '--use-mw' in sys.argv:
+        use_mw = True
+
+    if '--use-wine' in sys.argv:
+        use_wine = True
 
     if '--show-cmd' in sys.argv:
         show_cmd = True
 
     if '--keep-temp' in sys.argv:
         delete_temp = False
+
+    if '--fast-hack' in sys.argv:
+        fast_hack = True
 
 
     only_build = []
@@ -67,8 +75,8 @@ def parse_cmd_options():
         if arg.startswith('--gcc-path='):
             gcc_path = arg[11:] + '/'
 
-        if arg.startswith('--llvm-path='):
-            llvm_path = arg[12:] + '/'
+        if arg.startswith('--mw-path='):
+            mw_path = arg[10:] + '/'
 
     if len(only_build) == 0:
         only_build = None
@@ -287,20 +295,33 @@ class KamekBuilder:
         print_debug('---')
         print_debug('Compiling modules')
 
-        # gcc setup
-        cc_command = ['%s%s-gcc' % (gcc_path, gcc_type), '-nodefaultlibs', '-I.', '-fno-builtin', '-Os', '-fno-exceptions', '-fno-rtti', '-mno-sdata', '-c']
-        as_command = cc_command
+        if use_mw:
+            # metrowerks setup
+            cc_command = ['%smwcceppc.exe' % mw_path, '-I.', '-I-', '-I.', '-nostdinc', '-Cpp_exceptions', 'off', '-Os', '-proc', 'gekko', '-fp', 'hard', '-enum', 'int', '-sdata', '0', '-sdata2', '0', '-g', '-RTTI', 'off', '-use_lmw_stmw', 'on']
+            as_command = ['%smwasmeppc.exe' % mw_path, '-I.', '-I-', '-I.', '-nostdinc', '-proc', 'gekko', '-d', '__MWERKS__']
 
-        if 'defines' in self._config:
-            for d in self._config['defines']:
-                cc_command.append('-D%s' % d)
+            if 'defines' in self._config:
+                for d in self._config['defines']:
+                    cc_command.append('-d')
+                    cc_command.append(d)
+                    as_command.append('-d')
+                    as_command.append(d)
 
-        for i in self._config['include_dirs']:
-            cc_command.append('-I%s' % i)
+            for i in self._config['include_dirs']:
+                cc_command.append('-I%s' % i)
+                #cc_command.append(i)
+                as_command.append('-I%s' % i)
+                #as_command.append(i)
 
-        if use_clang:
-            # This is just for cc
-            cc_command = ['%sclang' % llvm_path, '-cc1', '-fno-rtti', '-fno-threadsafe-statics', '-fshort-wchar', '-nobuiltininc', '-nostdsysteminc', '-nostdinc++', '-Os', '-Wall', '-std=c++11', '-I.', '-emit-obj']
+            if use_wine:
+                cc_command.insert(0, 'wine')
+                as_command.insert(0, 'wine')
+
+        else:
+            # gcc setup
+            cc_command = ['%s%s-g++' % (gcc_path, gcc_type), '-nodefaultlibs', '-I.', '-fno-builtin', '-Os', '-fno-exceptions', '-fno-rtti', '-mno-sdata']
+            as_command = cc_command
+
             if 'defines' in self._config:
                 for d in self._config['defines']:
                     cc_command.append('-D%s' % d)
@@ -309,6 +330,10 @@ class KamekBuilder:
                 cc_command.append('-I%s' % i)
 
         self._moduleFiles = []
+
+        if fast_hack:
+            fast_cpp_path = os.path.join(self._configTempDir, 'fasthack.cpp')
+            fast_cpp = open(fast_cpp_path, 'w')
 
         for m in self.project.modules:
             for normal_sourcefile in m.data['source_files']:
@@ -323,10 +348,16 @@ class KamekBuilder:
                     # todo: better extension detection
                     if sourcefile.endswith('.s') or sourcefile.endswith('.S'):
                         command = as_command
+                    elif sourcefile.endswith('.cpp') and fast_hack:
+                        fast_cpp.write('//\n// %s\n//\n\n' % sourcefile)
+                        with open(sourcefile, 'r') as sf:
+                            fast_cpp.write(sf.read())
+                        fast_cpp.write('\n')
+                        continue
                     else:
                         command = cc_command
 
-                    new_command = command + ['-o', objfile, sourcefile]
+                    new_command = command + ['-c', '-o', objfile, sourcefile]
                     if sourcefile.endswith('.c'):
                         new_command.remove('-std=c++11')
 
@@ -343,6 +374,24 @@ class KamekBuilder:
                     sys.exit(1)
 
                 self._moduleFiles.append(objfile)
+
+        if fast_hack:
+            fast_cpp.close()
+
+            print_debug('Fast compilation!!')
+            objfile = os.path.join(self._configTempDir, 'fasthack.o')
+
+            new_command = cc_command + ['-c', '-o', objfile, fast_cpp_path]
+            if show_cmd:
+                print_debug(new_command)
+
+            errorVal = subprocess.call(new_command)
+            if errorVal != 0:
+                print('BUILD FAILED!')
+                print('compiler returned %d - an error occurred while compiling the fast hack' % errorVal)
+                sys.exit(1)
+
+            self._moduleFiles.append(objfile)
 
         print_debug('Compilation complete')
 
@@ -439,14 +488,14 @@ class KamekBuilder:
 
         # next up, run it through c++filt
         print_debug('Running c++filt')
-        p = subprocess.Popen(gcc_type + '-c++filt', stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+        p = subprocess.Popen('%s%s-c++filt' % (gcc_path, gcc_type), stdin=subprocess.PIPE, stdout=subprocess.PIPE)
 
         symbolNameList = [sym[1] for sym in self._symbols]
         filtResult = p.communicate('\n'.join(symbolNameList).encode())
         filteredSymbols = filtResult[0].decode().split('\n')
 
         for sym, filt in zip(self._symbols, filteredSymbols):
-            sym.append(filt)
+            sym.append(filt.strip())
 
         print_debug('Done. All symbols complete.')
         print_debug('Generated code is at 0x%08X .. 0x%08X' % (self._codeStart, self._codeEnd - 4))

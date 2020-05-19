@@ -31,9 +31,9 @@ Copyright (c) 2010-2013 Treeki, Tempus, megazig
 
 #### For compiling the Newer game hacks:
 
-- OS and setup where you can compile LLVM and Clang
+- CodeWarrior
 - devkitPPC
-- Python 2.x
+- Python 3.x
 - Python libraries: PyYAML, pyelftools
 
 #### For using the Newer tools:
@@ -45,28 +45,6 @@ Copyright (c) 2010-2013 Treeki, Tempus, megazig
 
 ### What's Here
 
-#### Clang Patchset
-
-Newer requires a modified version of the [Clang](http://www.llvm.org)
-compiler. Clang is a modern C/C++ compiler created as part of the LLVM project,
-and Newer uses it to generate compiled code that can be injected into the game.
-
-Most Wii homebrew development is done using GCC (usually as part of devkitPPC),
-but regular compilers cannot be used because the generated code uses a
-different C++ ABI from CodeWarrior (which is what Nintendo uses) and therefore
-is not compatible with the NSMBW binary.
-
-My (admittedly, very kludgey) patches to Clang modify various aspects of the
-generated code to work round this. It's not perfect: in particular, multiple
-inheritance and RTTI are not compatible and possibly entirely broken.
-Thankfully NSMBW doesn't really make use of these features, so it works just
-fine for Newer.
-
-Another caveat is that I stopped working on this a few months back, so you'll
-need to pull an old-ish version of LLVM and Clang from their SVN repos - the
-patch I included is based off SVN revision 184655. LLVM is unmodified, but you
-should probably also stick to this version of it to avoid possible
-incompatibilities.
 
 #### Kamek
 
