@@ -1828,6 +1828,9 @@ SECTIONS {
 	spawnCoinJump__7StageE4FRC7Point3diii = 0x80066630;
 	sub_800757B0__14collisionMgr_cFP7Point3dPfUcic = 0x800757B0;
 
+	ObjectProfileList = 0x8042a698;
+	profileNames = 0x80320b58;
+
 
 	.text : {
 		FILL (0)

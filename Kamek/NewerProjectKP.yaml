@@ -70,3 +70,4 @@ modules:
   - processed/pumpkinGoomba.yaml
   # - processed/pengi.yaml
 #  - processed/actorlog.yaml
+  - processed/profile.yaml
