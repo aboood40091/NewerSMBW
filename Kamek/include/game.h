@@ -4159,26 +4159,5 @@ class StageC4 {
 		u8 flags, _19, _1A, willDisplay, _1C, _1D;
 };
 
-struct SpriteData
-{
-    u16 profileId;
-    s32 xoffs;
-    s32 yoffs;
-    Recti spawnRange;
-    u16 _1C;
-    u16 _1E;
-    u16 _20;
-    u16 _22;
-    u16 flags;
-};
-
-class Profile
-{
-public:
-    dActor_c* (*buildFunc)();
-    u16 _4;
-    u16 _6;
-};
-
 #endif
 

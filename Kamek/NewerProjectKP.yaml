@@ -1,6 +1,7 @@
 output_dir: "NewerASM"
 code_address: 0x808D9000
 modules:
+  - processed/profile.yaml
   - processed/prolog.yaml
   - processed/corseClear.yaml
   - processed/apDebug.yaml
@@ -70,4 +71,3 @@ modules:
   - processed/pumpkinGoomba.yaml
   # - processed/pengi.yaml
 #  - processed/actorlog.yaml
-  - processed/profile.yaml

@@ -1828,7 +1828,10 @@ SECTIONS {
 	spawnCoinJump__7StageE4FRC7Point3diii = 0x80066630;
 	sub_800757B0__14collisionMgr_cFP7Point3dPfUcic = 0x800757B0;
 
+	originalSprites = 0x8030a340;
+	originalProfiles = 0x8076a748;
 	ObjectProfileList = 0x8042a698;
+	spriteFiles = 0x8031ab4c;
 	profileNames = 0x80320b58;
 
 

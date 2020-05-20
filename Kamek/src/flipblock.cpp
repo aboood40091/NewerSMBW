@@ -1,6 +1,40 @@
-#include "flipblock.h"
+#include <common.h>
+#include <game.h>
+#include "profile.h"
 
 const char *FlipBlockFileList[] = {"block_rotate", 0};
+
+class daEnFlipBlock_c : public daEnBlockMain_c {
+public:
+	Physics::Info physicsInfo;
+
+	int onCreate();
+	int onDelete();
+	int onExecute();
+	int onDraw();
+
+	void calledWhenUpMoveExecutes();
+	void calledWhenDownMoveExecutes();
+
+	void blockWasHit(bool isDown);
+
+	bool playerOverlaps();
+
+	mHeapAllocator_c allocator;
+	nw4r::g3d::ResFile resFile;
+	m3d::mdl_c model;
+
+	int flipsRemaining;
+
+	USING_STATES(daEnFlipBlock_c);
+	DECLARE_STATE(Wait);
+	DECLARE_STATE(Flipping);
+
+	static dActor_c *build();
+};
+
+const SpriteData flipBlockSpriteData = { ProfileId::FlipBlockTest, 8, -8 , 0 , 0, 0x100, 0x100, 0, 0, 0, 0, 0 };
+Profile flipBlockProfile(&daEnFlipBlock_c::build, SpriteId::FlipBlockTest, flipBlockSpriteData, ProfileId::FlipBlockTest, ProfileId::FlipBlockTest, "FlipBlockTest", FlipBlockFileList);
 
 
 CREATE_STATE(daEnFlipBlock_c, Wait);
@@ -76,7 +110,7 @@ int daEnFlipBlock_c::onDraw() {
 }
 
 
-daEnFlipBlock_c *daEnFlipBlock_c::build() {
+dActor_c *daEnFlipBlock_c::build() {
 
 	void *buffer = AllocFromGameHeap1(sizeof(daEnFlipBlock_c));
 	daEnFlipBlock_c *c = new(buffer) daEnFlipBlock_c;
