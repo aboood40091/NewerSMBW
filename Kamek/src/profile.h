@@ -19,11 +19,11 @@ struct SpriteData
 class Profile
 {
 public:
-    Profile(dActor_c* (*buildFunc)(), u32 spriteId, const SpriteData& spriteData, u16 unk1, u16 unk2, const char* name, const char** files=NULL);
+    Profile(dActor_c* (*buildFunc)(), u32 spriteId, const SpriteData& spriteData, u16 executeOrderProfileId, u16 drawOrderProfileId, const char* name, const char** files=NULL);
 
     dActor_c* (*buildFunc)();
-    u16 _4;
-    u16 _6;
+    u16 executeOrderProfileId;
+    u16 drawOrderProfileId;
 };
 
 extern "C" SpriteData originalSprites[483];

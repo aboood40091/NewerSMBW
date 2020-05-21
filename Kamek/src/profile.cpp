@@ -23,6 +23,7 @@ static SpritesSetter doSetSprites;
 /* PROFILES */
 
 Profile* profiles[ProfileId::Num] = { 0 };
+extern Profile** ObjectProfileList;
 
 class ProfileSetter
 {
@@ -32,13 +33,13 @@ public:
 
 ProfileSetter::ProfileSetter()
 {
+    ObjectProfileList = &profiles[0];
+
     for (u32 i = 0; i < 750; i++)
         profiles[i] = originalProfiles[i];
 }
 
 static ProfileSetter doSetProfiles;
-
-extern Profile** ObjectProfileList;
 
 void SetObjectProfileList()
 {
@@ -65,11 +66,11 @@ const char* getProfileName(u32 profileId)
 
 /* CUSTOM PROFILE CTOR */
 
-Profile::Profile(dActor_c* (*buildFunc)(), u32 spriteId, const SpriteData& spriteData, u16 unk1, u16 unk2, const char* name, const char** files)
+Profile::Profile(dActor_c* (*buildFunc)(), u32 spriteId, const SpriteData& spriteData, u16 executeOrderProfileId, u16 drawOrderProfileId, const char* name, const char** files)
 {
     this->buildFunc = buildFunc;
-    this->_4 = unk1;
-    this->_6 = unk2;
+    this->executeOrderProfileId = executeOrderProfileId;
+    this->drawOrderProfileId = drawOrderProfileId;
 
     sprites[spriteId] = spriteData;
     if (spriteId < 483)

@@ -76,7 +76,7 @@ hooks:
   - name: SetObjectProfileList
     type: branch_insn
     branch_type: b
-    src_addr_pal: 0x807686b0
+    src_addr_pal: 0x80768690
     target_func: 'SetObjectProfileList'
 
   - name: SetSpriteFileList
