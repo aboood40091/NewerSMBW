@@ -1,7 +1,5 @@
 #include "profile.h"
 
-extern "C" {
-
 /* SPRITES */
 
 SpriteData sprites[SpriteId::Num] = { 0 };
@@ -56,7 +54,7 @@ const char** customSpriteFiles[SpriteId::Num - 483] = { 0 };
 extern const char* profileNames[750];
 const char* customProfileNames[ProfileId::Num - 750] = { 0 };
 
-const char* getProfileName(u32 profileId)
+const char* GetProfileName(u32 profileId)
 {
     if (profileId < 750)
         return profileNames[profileId];
@@ -85,6 +83,4 @@ Profile::Profile(dActor_c* (*buildFunc)(), u32 spriteId, const SpriteData& sprit
 
     else
         customProfileNames[spriteData.profileId - 750] = name;
-}
-
 }

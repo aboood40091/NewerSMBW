@@ -26,8 +26,8 @@ public:
     u16 drawOrderProfileId;
 };
 
-extern "C" SpriteData originalSprites[483];
-extern "C" SpriteData sprites[];
+extern SpriteData originalSprites[483];
+extern SpriteData sprites[];
 
-extern "C" Profile* originalProfiles[750];
-extern "C" Profile* profiles[];
+extern Profile* originalProfiles[750];
+extern Profile* profiles[];

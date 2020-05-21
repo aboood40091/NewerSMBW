@@ -77,7 +77,7 @@ hooks:
     type: branch_insn
     branch_type: b
     src_addr_pal: 0x80768690
-    target_func: 'SetObjectProfileList'
+    target_func: 'SetObjectProfileList(void)'
 
   - name: SetSpriteFileList
     type: branch_insn
@@ -89,4 +89,4 @@ hooks:
     type: branch_insn
     branch_type: b
     src_addr_pal: 0x801018c0
-    target_func: 'getProfileName'
+    target_func: 'GetProfileName(unsigned int)'
