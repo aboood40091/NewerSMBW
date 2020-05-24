@@ -1,7 +1,7 @@
 #pragma once
 
 #include <game.h>
-#include "profileid.h"
+#include <profileid.h>
 
 struct SpriteData
 {

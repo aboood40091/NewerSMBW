@@ -189,7 +189,7 @@ bool IsWideScreen();
 
 #define SAVE_BIT_NEW 1
 
-// Controls whether you can QUICK SAVE or not.
+// Controls whether you can QUICK SAVE or not. 
 // Set if 8-Castle is complete.
 #define SAVE_BIT_GAME_COMPLETE 2
 
@@ -1328,7 +1328,7 @@ public:
 	u16 getTileNum();
 	bool getSomeBool();
 	void setSomeBool(u8 value);
-
+	
 	float getX();
 	float getY();
 	float getZ();
@@ -1339,7 +1339,7 @@ public:
 
 	void setVars(float scale); // sets unkFlag=1, rotation=0, unkByte=0
 	void setVars(float scale, s16 rotation); // sets unkFlag=2, unkByte=0
-
+	
 	float getScale();
 	float getRotationFloat();
 	s16 getRotation();
@@ -1438,11 +1438,11 @@ public:
 	void setY(float value);
 	void setWidth(float value);
 	void setHeight(float value);
-
+	
 	void setPtrToRotation(s16 *ptr);
 
 	void update();
-
+	
 	static Physics *globalListHead;
 	static Physics *globalListTail;
 	// todo: more stuff that might not be relevant atm
@@ -1507,7 +1507,7 @@ public:
 	float xCenter();
 
 	// Plus more stuff that isn't needed in the public API, I'm pretty sure.
-
+	
 	static ActivePhysics *globalListHead;
 	static ActivePhysics *globalListTail;
 };
@@ -1698,7 +1698,7 @@ enum SensorFlags {
 	SENSOR_HIT_OR_BREAK_BRICK = 0xC00000,
 	SENSOR_1000000 = 0x1000000, // has not shown up yet...?
 	SENSOR_2000000 = 0x2000000, // corresponds to SCF_400?
-	SENSOR_4000000 = 0x4000000, // something related to hitting blocks
+	SENSOR_4000000 = 0x4000000, // something related to hitting blocks 
 	SENSOR_8000000 = 0x8000000, // corresponds to SCF_20?
 	SENSOR_10000000 = 0x10000000, // used
 	SENSOR_20000000 = 0x20000000, // used
@@ -2023,7 +2023,7 @@ public:
 
 class StageActorLight {
 public:
-
+	
 	virtual void init(void *allocator, int);
 	virtual void update();
 	virtual void draw();
@@ -2428,9 +2428,9 @@ public:
 	ActivePhysics cPhysics;
 	ActivePhysics dPhysics;
 	ActivePhysics ePhysics;
-
+	
 	dAc_Py_c();
-
+	
 	int beforeCreate();
 	int afterCreate(int);
 	int beforeDelete();
@@ -2439,7 +2439,7 @@ public:
 	int afterExecute(int);
 	int beforeDraw();
 	int afterDraw(int);
-
+	
 	~dAc_Py_c();
 };
 
@@ -2523,13 +2523,13 @@ public:
 	void doStateChange(dStateBase_c *state); // might return bool, dunno
 
 	// Now here's where the fun starts.
-
+	
 	virtual bool preSpriteCollision(ActivePhysics *apThis, ActivePhysics *apOther);
 	virtual bool prePlayerCollision(ActivePhysics *apThis, ActivePhysics *apOther);
 	virtual bool preYoshiCollision(ActivePhysics *apThis, ActivePhysics *apOther);
 
 	virtual bool stageActorCollision(ActivePhysics *apThis, ActivePhysics *apOther);
-
+	
 	virtual void spriteCollision(ActivePhysics *apThis, ActivePhysics *apOther);
 	virtual void playerCollision(ActivePhysics *apThis, ActivePhysics *apOther);
 	virtual void yoshiCollision(ActivePhysics *apThis, ActivePhysics *apOther);
@@ -3143,7 +3143,7 @@ namespace nw4r {
 				float CalcStringWidth(wchar_t const *string, int length) const;
 
 				float Print(wchar_t const *string, int length);
-
+				
 				float CalcLineWidth(wchar_t const *string, int length);
 
 				float GetLineSpace() const;
@@ -3259,7 +3259,7 @@ namespace m2d {
 			float lastFrame; // 0x0C
 			float speed; // 0x10; default: 1
 			u8 flags; // 0x14
-
+			
 			void processAnim(); // 0x80163800
 			void setup(u8 flags, float frameCount, float speed, float initialFrame); // 0x801638A0
 			void setCurrentFrame(float frame); // 0x80163910
@@ -3381,7 +3381,7 @@ class TilemapClass {
 		u32 _404;
 
 		u8 blockLookup[2048];
-
+		
 		u16 blockCount;
 
 		u32 _C0C;
@@ -3446,9 +3446,9 @@ void ConvertStagePositionToScreenPosition(Vec2 *screen, Vec *stage);
 class SoundPlayingClass /* : public something */ {
 public:
 	// Size: 0x17C
-
+	
 	void PlaySoundAtPosition(int id, Vec2 *pos, u32 flags); // 80198D70
-
+	
 	static SoundPlayingClass *instance1; // 8042A03C
 	static SoundPlayingClass *instance2; // 8042A03C
 	static SoundPlayingClass *instance3; // 8042A03C
@@ -3472,7 +3472,7 @@ class dEffectBreakMgr_c {
 		bool spawnTile(Vec *position, u32 settings, char param);
 		// Settings:
 		// (BlockType << 8) | (HalfSpeedFlag << 4) | (VelocityChange & 3)
-		//
+		// 
 		// Types:
 		// 0=Brick, 1=Stone, 2=Wood, 3=Question, 4=Used
 		// 5=Red, 6=Used, 7=Unused, 8=Final Battle
