@@ -1,6 +1,7 @@
 .text
 
 .extern sprites
+.extern spriteFiles
 .extern customSpriteFiles
 
 .global SpriteList_r3
@@ -44,7 +45,12 @@ SpriteList_r30:
 SetSpriteFileList:
     lhz r0, 0(r24)
     cmpwi r0, 483
-    bltlr
+    bge SetSpriteFileListCustom
+    lis r25, spriteFiles@ha
+    addi r25, r25, spriteFiles@l
+    blr
+
+SetSpriteFileListCustom:
     mr r25, r0
     subi r25, r25, 483
     mr r0, r25
