@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 
 # Kamek - build tool for custom C++ code in New Super Mario Bros. Wii
-# All rights reserved (c) Treeki 2010 - 2012
+# All rights reserved (c) Treeki 2010 - 2013
 # Header files compiled by Treeki, Tempus and megazig
 
 # Requires PyYAML and pyelftools
 
-version_str = 'Kamek 0.2 by Treeki'
+version_str = 'Kamek 0.4 by Treeki - Updated By AboodXD'
 
 import binascii
 import os
@@ -31,7 +31,6 @@ use_wine = False
 mw_path = ''
 gcc_path = ''
 gcc_type = 'powerpc-eabi'
-gcc_append_exe = False
 show_cmd = False
 delete_temp = True
 override_config_file = None
@@ -41,7 +40,7 @@ fast_hack = False
 
 def parse_cmd_options():
     global use_rels, use_mw, use_wine, show_cmd, delete_temp, only_build, fast_hack
-    global override_config_file, gcc_type, gcc_path, gcc_append_exe, mw_path
+    global override_config_file, gcc_type, gcc_path, mw_path
 
     if '--no-rels' in sys.argv:
         use_rels = False
@@ -60,9 +59,6 @@ def parse_cmd_options():
 
     if '--fast-hack' in sys.argv:
         fast_hack = True
-
-    if '--gcc-append-exe' in sys.argv:
-        gcc_append_exe = True
 
 
     only_build = []
@@ -160,7 +156,7 @@ def generate_kamek_patches(patchlist):
     return kamekpatch
 
 
-class DyLinkCreator(object):
+class DyLinkCreator:
     R_PPC_ADDR32 = 1
     R_PPC_ADDR16_LO = 4
     R_PPC_ADDR16_HI = 5
@@ -242,7 +238,7 @@ class DyLinkCreator(object):
 
 
 
-class KamekModule(object):
+class KamekModule:
     _requiredFields = ['source_files']
 
 
@@ -267,7 +263,7 @@ class KamekModule(object):
 
 
 
-class KamekBuilder(object):
+class KamekBuilder:
     def __init__(self, project, configs):
         self.project = project
         self.configs = configs
@@ -448,6 +444,8 @@ class KamekBuilder(object):
                         command = cc_command
 
                     new_command = command + ['-c', '-o', objfile, sourcefile]
+                    if sourcefile.endswith('.c'):
+                        new_command.remove('-std=c++11')
 
                     if 'cc_args' in m.data:
                         new_command += m.data['cc_args']
@@ -496,8 +494,7 @@ class KamekBuilder(object):
         outname = 'object.plf' if self.dynamic_link_base else 'object.bin'
         self._currentOutFile = '%s/%s_%s' % (self._outDir, nice_name, outname)
 
-        exe = '.exe' if gcc_append_exe else ''
-        ld_command = ['%s%s-ld%s' % (gcc_path, gcc_type, exe), '-L.']
+        ld_command = ['%s%s-ld' % (gcc_path, gcc_type), '-L.']
         ld_command.append('-o')
         ld_command.append(self._currentOutFile)
         if self.dynamic_link_base:
@@ -576,11 +573,11 @@ class KamekBuilder(object):
 
         # next up, run it through c++filt
         print_debug('Running c++filt')
-        p = subprocess.Popen('%s/powerpc-eabi-c++filt.exe' % (gcc_path), stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+        p = subprocess.Popen('%s%s-c++filt' % (gcc_path, gcc_type), stdin=subprocess.PIPE, stdout=subprocess.PIPE)
 
         symbolNameList = [sym[1] for sym in self._symbols]
-        filtResult = p.communicate('\n'.join(symbolNameList).encode('utf-8'))
-        filteredSymbols = filtResult[0].decode('utf-8').split('\n')
+        filtResult = p.communicate('\n'.join(symbolNameList).encode())
+        filteredSymbols = filtResult[0].decode().split('\n')
 
         for sym, filt in zip(self._symbols, filteredSymbols):
             sym.append(filt.strip())
@@ -652,7 +649,7 @@ class KamekBuilder(object):
 
 
 
-class KamekProject(object):
+class KamekProject:
     _requiredFields = ['output_dir', 'modules']
 
 
@@ -694,7 +691,7 @@ class KamekProject(object):
 
 def main():
     print(version_str)
-    print('')
+    print()
 
     if len(sys.argv) < 2:
         print('No input file specified')

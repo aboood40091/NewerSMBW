@@ -22,7 +22,7 @@ def make_branch_insn(fromAddr, toAddr, branchType):
 
 
 
-class HookContext(object):
+class HookContext:
     """Object which can be used by each hook type to hold data."""
 
     def __init__(self):
@@ -30,7 +30,7 @@ class HookContext(object):
 
 
 
-class Hook(object):
+class Hook:
     """Generic hook class"""
 
     has_context = False
