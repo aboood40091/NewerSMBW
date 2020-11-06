@@ -543,8 +543,6 @@ ReplaceExceptionOccurred:
 	ori r3, r3, NewExceptionOccurred@l
 	blr
 
-#.section .ctors,4
-#.long CRAPPYALLOC
 .data
 NewExceptionOccurred:
 .string "Whoops! Newer 1.0.2 has crashed.\nPlease take a screenshot of the info below\nand send it to newer@newerteam.com.\nYou can scroll through this report using the D-Pad.\n"
@@ -557,7 +555,3 @@ SCMs: .string "Setting music to %d\n"
 
 .global Rrun
 Rrun: .string "Rrun"
-
-.global enableHardMode
-enableHardMode:
-	.byte 0
