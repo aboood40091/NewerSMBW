@@ -66,7 +66,7 @@ SECTIONS {
 
 	PlayerAnimStates = 0x802F1650;
 	ContinueFromFixFireballSensorSetup = 0x8011A830;
-	GetPosForLayoutEffect__FP7Point3db = 0x800B37E0;
+	GetPosForLayoutEffect__FP4VEC3b = 0x800B37E0;
 
 	ContinueFromJustOneBomb = 0x80A123AC;
 
@@ -87,13 +87,14 @@ SECTIONS {
 	setPermanentForcedButtons__14dPlayerInput_cFUi = 0x8005E910;
 	setTransientForcedButtons__14dPlayerInput_cFUi = 0x8005E960;
 	unsetPermanentForcedButtons__14dPlayerInput_cFUi = 0x8005E930;
+	areWeShaking__14dPlayerInput_cFv = 0x8005E780;
 	setFlag__10daPlBase_cFi = 0x80056C70;
 	clearFlag__10daPlBase_cFi = 0x80056CB0;
 	testFlag__10daPlBase_cFi = 0x80056CF0;
 	isReadyForDemoControlAction__10daPlBase_cFv = 0x80052030;
 
 	instance__15dWaterManager_c = 0x8042A3E0;
-	queryPosition__15dWaterManager_cFP7Point2dP7Point2dPfPsi = 0x800EBA40;
+	queryPosition__15dWaterManager_cFP4VEC2P4VEC2PfPsi = 0x800EBA40;
 
 	OriginalPowBlockActivated = 0x800A0C70;
 
@@ -167,9 +168,12 @@ SECTIONS {
 	GetBMG__Fv = 0x800CDD50;
 	findStringForMessageID__Q23EGG6MsgResCFii = 0x802D7B50;
 	WriteBMGToTextBox__FPQ34nw4r3lyt7TextBoxPQ27dScript5Res_ciiie = 0x800C9B50;
+	_Z26WriteParsedStringToTextBoxPN4nw4r3lyt7TextBoxEPKwiPA1_13__va_list_tagPN7dScript5Res_cE = 0x800C9F70; /*addAnyway*//*mi*/
+	CheckForUSD1ShadowEntry__FPQ34nw4r3lyt7TextBox = 0x800C9BF0;
+	GetExtUserDataNum__Q34nw4r3lyt4PaneCFv = 0x802AC5A0;
 
-	m2d__Anm_c__Load = 0x801644F0;
-	m2d__AnmResHandler_c__Load = 0x80163FA0;
+	m2d__Anm_c__Load = 0x801644F0;/*mi*/
+	m2d__AnmResHandler_c__Load = 0x80163FA0;/*mi*/
 
 	RealAcPyDtor = 0x80144820;
 	RealWm2dPlayerDtor = 0x808C5500;
@@ -187,7 +191,7 @@ SECTIONS {
 	PClownCarMove = 0x80811E70;
 	ContinueFromClownCarDetectAdjacent = 0x80812104;
 
-	sAllocatorFunc__FrmHeap = 0x8042E5B0;
+	sAllocatorFunc__FrmHeap = 0x8042E5B0;/*mi*/
 
 	GetActivePlayerCount = 0x8005FFB0;
 	GetCountofActivePlayers = 0x8005FFB0;
@@ -256,12 +260,14 @@ SECTIONS {
 	init__18StandOnTopColliderFP13dStageActor_cfffffsUcP7Point2d = 0x800DB270;
 	__ct__18StandOnTopColliderFv = 0x800DB220;
 	__dt__18StandOnTopColliderFv = 0x80044400;
+	_ZN18StandOnTopCollider6updateEv = 0x800DB3E0; /*addAnyway*/
 
 
 	__dt__13BasicColliderFv = 0x800DAEF0;
 	globalListHead__13BasicCollider = 0x8042A2FC;
 
 	addToList__13BasicColliderFv = 0x800DAF70;
+	removeFromList__13BasicColliderFv = 0x800DAFC0;
 
 	__ct__21RideableActorColliderFv = 0x800DB540;
 	init__21RideableActorColliderFP13dStageActor_cP7Point2dP7Point2d = 0x800DB590;
@@ -344,7 +350,7 @@ SECTIONS {
 	HandleXSpeed = 0x8006CD90;
 	HandleYSpeed = 0x8006CDE0;
 	UpdateObjectPosBasedOnSpeedValues_real = 0x8006CD40;
-	dSprite_c__getXDirectionOfFurthestPlayerRelativeToVEC3 = 0x80096240;
+	dSprite_c__getXDirectionOfFurthestPlayerRelativeToVEC3  = 0x80096240;/*mi*/
 	CalculateDistanceFromActorsNextPosToFurthestPlayer = 0x80064740;
 	
 	doSpriteMovement = 0x800955F0;
@@ -358,7 +364,7 @@ SECTIONS {
 
 
 	Actor_GetVec3WithValuesAdded = 0x8006CED0;
-	ConvertStagePositionIntoScreenPosition__Maybe = 0x8006A4B0;
+	ConvertStagePositionIntoScreenPosition__Maybe  = 0x8006A4B0;/*mi*/
 	AnotherSoundRelatedFunction = 0x80198040;
 	YetAnotherSoundPlayer = 0x80199100;
 	CheckIfPlayingSound = 0x80196740;
@@ -533,9 +539,11 @@ SECTIONS {
 	fBase_c__Delete__FPv = 0x80162650;
 
 	__vt__15StageActorLight = 0x80317B78;
-	init__15StageActorLight_FPvi = 0x800CCB70;
+	init__15StageActorLightFPvi = 0x800CCB70;
 	update__15StageActorLight = 0x800CCC30;
 	draw__15StageActorLight = 0x800CCCE0;
+	_ZN15StageActorLight6updateEv = 0x800CCCE0; /*addAnyway*/
+	_ZN15StageActorLight4drawEv = 0x800CCCE0; /*addAnyway*/
 	__dt__15StageActorLight = 0x800414A0;
 
 	GetExplanationString__7dBase_cFv = 0x8006C660;
@@ -598,6 +606,7 @@ SECTIONS {
 	_vfCC__5dEn_cFP7Point2df = 0x800973F0;
 	_vfD0__5dEn_cFP7Point2df = 0x800974F0;
 	doStateChange__5dEn_cFP12dStateBase_c = 0x800A7DF0;
+	_ZN5dEn_c5_vfACEPv = 0x80097DF0; /*addAnyway*/
 	collisionCallback__5dEn_cFP13ActivePhysicsP13ActivePhysics = 0x80095950;
 	preSpriteCollision__5dEn_cFP13ActivePhysicsP13ActivePhysics = 0x80095CE0;
 	prePlayerCollision__5dEn_cFP13ActivePhysicsP13ActivePhysics = 0x80095D30;
@@ -717,7 +726,7 @@ SECTIONS {
 	doSpriteMovement__5dEn_cFv = 0x800955F0;
 	CheckIfPlayerBelow__5dEn_cFff = 0x800978C0;
 	stuffRelatingToCollisions__5dEn_cFfff = 0x800957B0;
-	checkLiquidImmersion__5dEn_cFP7Point2df = 0x80097250;
+	checkLiquidImmersion__5dEn_cFP4VEC2f = 0x80097250;
 	bouncePlayer__5dEn_cFPvf = 0x800967A0;
 
 	__ct__13dActorState_cFv = 0x80066FC0;
@@ -773,6 +782,7 @@ SECTIONS {
 	outOfZone__13dStageActor_cF7Point3dPfUc = 0x80064da0;
 	checkZoneBoundaries__13dStageActor_cFUi = 0x80064F50;
 	create__13dStageActor_cF6ActorsUiP7Point3dP6S16VecUc = 0x80064610;
+	create__13dStageActor_cF6ActorsUiP4VEC3P6S16VecUc = 0x80064610;
 	Delete__13dStageActor_cFUc = 0x80064d10;
 
 	__ct__8dScene_cFv = 0x800E1AA0;
@@ -891,7 +901,7 @@ SECTIONS {
 	callVF20__21dPlayerModelHandler_cFv = 0x800D70F0;
 	draw__21dPlayerModelHandler_cFv = 0x800D7110;
 	update__21dPlayerModelHandler_cFv = 0x800D6F80;
-	setMatrix__21dPlayerModelHandler_cFPA4_f = 0x800D6FA0;
+	setMatrix__21dPlayerModelHandler_cFPA4_f  = 0x800D6FA0; /*addAnyway*/
 
 	_Z15FindActorByType6ActorsP5Actor = 0x80162E90;
 	FindActorByType__F6ActorsP5Actor = 0x80162E90;
@@ -915,12 +925,15 @@ SECTIONS {
 
 	__ct__Q23EGG6ScreenFv = 0x802D0FB0;
 	__dt__Q23EGG6ScreenFv = 0x802D0D90;
+	_ZN3EGG6Screen14loadIntoCameraEN4nw4r3g3d6CameraE = 0x802D1300; /*addAnyway*/
 
 	__vt__Q23EGG12LookAtCamera = 0x803503B8;
+	_ZN3EGG12LookAtCamera15calculateMatrixEv = 0x802BECF0; /*addAnyway*/
 	assignToNW4RCamera__Q23EGG12LookAtCameraFRQ34nw4r3g3d6Camera = 0x802BEB70;
 
 	__ct__Q23EGG12ProjectOrthoFv = 0x802BF6C0;
 	setVolume__Q23EGG12ProjectOrthoFffff = 0x802BF710;
+	_ZN3EGG12ProjectOrtho18setOrthoOntoCameraERN4nw4r3g3d6CameraE = 0x802C0110; /*addAnyway*/
 
 	GetCameraByID__Fi = 0x80164C60;
 	GetCurrentCameraID__Fv = 0x80164C80;
@@ -957,6 +970,7 @@ SECTIONS {
 
 	__ct__Q23m2d13EmbedLayout_cFv = 0x800C89A0;
 	__dt__Q23m2d13EmbedLayout_cFv = 0x800C89F0;
+	_ZN3m2d13EmbedLayout_c5buildEPKcPNS_8ResAcc_cE = 0x800C8A60; /*addAnyway*/
 	loadArc__Q23m2d13EmbedLayout_cFPCcb = 0x800C8D00;
 	getPanes__Q23m2d13EmbedLayout_cCFPPCcPPQ34nw4r3lyt4Panei = 0x800C8E50;
 	getWindows__Q23m2d13EmbedLayout_cCFPPCcPPQ34nw4r3lyt6Windowi = 0x800C8EC0;
@@ -992,7 +1006,7 @@ SECTIONS {
 	SetPerspective__Q34nw4r3g3d6CameraFffff = 0x80253D70;
 	SetViewportJitter__Q34nw4r3g3d6CameraFUi = 0x80253F60;
 	SetPosture__Q34nw4r3g3d6CameraFRCQ44nw4r3g3d6Camera11PostureInfo = 0x80253B00;
-	SetPosition__Q34nw4r3g3d6CameraFRC7Point3d = 0x80253A90;
+	SetPosition__Q34nw4r3g3d6CameraFRC4VEC3 = 0x80253A90;
 	SetCameraMtxDirectly__Q34nw4r3g3d6CameraFRA3_A4_Cf = 0x80253D20;
 	GetCameraMtx__Q34nw4r3g3d6CameraCFPA3_A4_f = 0x802541F0;
 
@@ -1029,13 +1043,15 @@ SECTIONS {
 	setup__Q23m3d5mdl_cFQ34nw4r3g3d6ResMdlPvUiiPUi = 0x80169ED0;
 	oneSetupType__Q23m3d5mdl_cFv = 0x80064C10;
 	sub_80064BF0__Q23m3d5mdl_cFv = 0x80064BF0;
-	setDrawMatrix__Q23m3d5mdl_cFPA4_Cf = 0x8016A2B0;
+	setDrawMatrix__Q23m3d5mdl_cFPA4_Cf = 0x8016A2B0; /*addAnyway*/
 	setScale__Q23m3d5mdl_cFfff = 0x8016A270;
 	setScale__Q23m3d5mdl_cFP7Point3d = 0x8016A290;
 	calcWorld__Q23m3d5mdl_cFb = 0x8016A2E0;
 	bindAnim__Q23m3d5mdl_cFPQ23m3d6banm_cf = 0x8016a0c0;
+	_ZN3m3d5mdl_c8bindAnimEPNS_6banm_cE = 0x8016A070; /*addAnyway*/
 	vf1C__Q3m3d5mdl_cFv = 0x8016a080;
-	getMatrixForNode__Q23m3d5mdl_cFUiPA4_f = 0x801682C0;
+	getMatrixForNode__Q23m3d5mdl_cFUiPA4_f = 0x801682C0; /*addAnyway*/
+	_ZN3m3d5mdl_c18scheduleForDrawingEv = 0x8016A220; /*addAnyway*/
 
 	SetCullModeForMaterial__FPQ23m3d5mdl_ci11_GXCullMode = 0x8000D190;
 	SetupTextures_Player__FPQ23m3d5mdl_ci = 0x800B3E50;
@@ -1568,7 +1584,7 @@ SECTIONS {
 	setFrameForEntry__Q23m3d8anmClrFfi = 0x80166430;
 	getUpdateRateForEntry__Q23m3d8anmClrFv = 0x80166440;
 	setUpdateRateForEntry__Q23m3d8anmClrFfi = 0x80166450;
-	isEntryAnimationDone__Q23m3d8anmClrFv = 0x80166460;
+	isEntryAnimationDone__Q23m3d8anmClrFi = 0x80166460;
 	queryEntrySomething__Q23m3d8anmClrFv = 0x80166470;
 	setEntryByte34__Q23m3d8anmClrFUci = 0x80166480;
 	getEntryField28__Q23m3d8anmClrFv = 0x801664A0;
@@ -1617,7 +1633,7 @@ SECTIONS {
 	vf0C__Q23m3d10anmTexSrt_c__child_cFv = 0x80167d70;
 
 
-	m3d__mdl_c__DoStuff = 0x80169ED0;
+	m3d__mdl_c__DoStuff = 0x80169ED0;/*mi*/
 
 	__ashldi3 = 0x802DD4DC;
 
@@ -1634,8 +1650,8 @@ SECTIONS {
 
 	EGGTSystem_Pointer = 0x8042A36C;
 
-	dSys_c__RootHeapMEM1 = 0x8042A370;
-	dSys_c__RootHeapMEM2 = 0x8042A374;
+	dSys_c__RootHeapMEM1 = 0x8042A370;/*mi*/
+	dSys_c__RootHeapMEM2 = 0x8042A374;/*mi*/
 
 	BG_GM_ptr = 0x8042A0B0;
 	instance__7dBgGm_c = 0x8042A0B0;
@@ -1663,17 +1679,17 @@ SECTIONS {
 	sub_80166970 = 0x80166970;
 	sub_80166D10 = 0x80166D10;
 
-	daEnGakeNoko_c__StateID_FoolMove = 0x80B14BC0;
+	daEnGakeNoko_c__StateID_FoolMove = 0x80B14BC0;/*mi*/
 
 	EnItem_BindAnimation_Continued = 0x80A291E4;
-	dAcPy_c__ChangePowerupWithAnimation = 0x80145C00;
+	dAcPy_c__ChangePowerupWithAnimation = 0x80145C00;/*mi*/
 	PlayerProjectileShooting = 0x8013BCD0;
 
 	PlayPlayerSound = 0x80057E70;
 	CreateActor = 0x80064610;
 	Actor_SearchByName = 0x80162E90;
 
-	daEnItem_c__GetWhetherPlayerCanGetPowerupOrNot = 0x80A2BE60;
+	daEnItem_c__GetWhetherPlayerCanGetPowerupOrNot = 0x80A2BE60;/*mi*/
 
 	returnFromGPSFASixth = 0x80141FF8;
 
@@ -1744,6 +1760,7 @@ SECTIONS {
 
 	__vt__Q23mEf3es2 = 0x80329CA0;
 	__dt__Q23mEf3es2Fv = 0x80025F60;
+	_ZN3mEf3es25spawnEPKcjPK4VEC3PK6S16VecS5_ = 0x8016D3C0; /*addAnyway*/
 
 	RectanglesOverlap__FP7Point3dP7Point3dP7Point3dP7Point3d = 0x800B3100;
 
@@ -1828,7 +1845,6 @@ SECTIONS {
 	spawnCoinJump__7StageE4FRC7Point3diii = 0x80066630;
 	sub_800757B0__14collisionMgr_cFP7Point3dPfUcic = 0x800757B0;
 
-
 	.text : {
 		FILL (0)
 
@@ -1840,12 +1856,13 @@ SECTIONS {
 		__ctor_end = . ;
 		*(.dtors)
 		*(.rodata)
+		*(.rodata.*)
 		/**(.sdata)*/
 		*(.data)
+		*(.data.*)
 		/**(.sbss)*/
 		*(.bss)
 		*(.fini)
-		*(.rodata.*)
 		__text_end  = . ;
 	}
 }
