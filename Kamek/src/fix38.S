@@ -27,8 +27,3 @@ fix38WithJumpCoin:
 
 isExemptedActor:
 	b continueFromFlagObjCheck
-
-.global PreventW5Vine
-PreventW5Vine:
-	li r3, 1
-	blr

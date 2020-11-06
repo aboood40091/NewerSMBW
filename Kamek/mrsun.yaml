@@ -1,7 +1,7 @@
 ---
 # Replaces EN_WALLINSECT
 
-source_files: [../src/mrsun.cpp]
+source_files: [../src/mrsun.cpp, ../src/boss.cpp]
 hooks:
   - name: BuildMrSun
     type: add_func_pointer

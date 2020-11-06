@@ -12,4 +12,3 @@ hooks:
     type: add_func_pointer
     src_addr_pal: 0x80AEE1A4
     target_func: 'EventLooper_Execute(EventLooper *)'
-        

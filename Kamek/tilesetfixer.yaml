@@ -6,6 +6,7 @@ hooks:
     branch_type: bl
     src_addr_pal: 0x80081718
     target_func: 'TilesetFixerHack(void *, void *, int, int)'
+
   - name: TilesetFixHack2
     type: branch_insn
     branch_type: bl

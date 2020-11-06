@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 
 # Kamek - build tool for custom C++ code in New Super Mario Bros. Wii
-# All rights reserved (c) Treeki 2010 - 2013
+# All rights reserved (c) Treeki 2010 - 2012
 # Header files compiled by Treeki, Tempus and megazig
 
 # Requires PyYAML and pyelftools
 
-version_str = 'Kamek 0.4 by Treeki - Updated By AboodXD'
+version_str = 'Kamek 0.2 by Treeki'
 
 import binascii
 import os
@@ -18,8 +18,9 @@ import sys
 import tempfile
 import yaml
 
+import elftools.elf.elffile
+
 import hooks
-from linker import DyLinkCreator
 
 u32 = struct.Struct('>I')
 
@@ -30,6 +31,7 @@ use_wine = False
 mw_path = ''
 gcc_path = ''
 gcc_type = 'powerpc-eabi'
+gcc_append_exe = False
 show_cmd = False
 delete_temp = True
 override_config_file = None
@@ -39,7 +41,7 @@ fast_hack = False
 
 def parse_cmd_options():
     global use_rels, use_mw, use_wine, show_cmd, delete_temp, only_build, fast_hack
-    global override_config_file, gcc_type, gcc_path, mw_path
+    global override_config_file, gcc_type, gcc_path, gcc_append_exe, mw_path
 
     if '--no-rels' in sys.argv:
         use_rels = False
@@ -58,6 +60,9 @@ def parse_cmd_options():
 
     if '--fast-hack' in sys.argv:
         fast_hack = True
+
+    if '--gcc-append-exe' in sys.argv:
+        gcc_append_exe = True
 
 
     only_build = []
@@ -155,10 +160,89 @@ def generate_kamek_patches(patchlist):
     return kamekpatch
 
 
+class DyLinkCreator(object):
+    R_PPC_ADDR32 = 1
+    R_PPC_ADDR16_LO = 4
+    R_PPC_ADDR16_HI = 5
+    R_PPC_ADDR16_HA = 6
+    R_PPC_REL24 = 10
+
+    VALID_RELOCS = set([1, 4, 5, 6, 10])
+
+    def __init__(self, other=None):
+        if other:
+            self._relocs = other._relocs[:]
+
+            self._targets = other._targets[:]
+            self._target_lookups = other._target_lookups.copy()
+        else:
+            self._relocs = []
+
+            self._targets = []
+            self._target_lookups = {}
+
+        self.elf = None
+
+    def set_elf(self, stream):
+        if self.elf != None:
+            raise ValueError('ELF already set')
+
+        self.elf = elftools.elf.elffile.ELFFile(stream)
+        self.code = self.elf.get_section_by_name('.text').data()
+
+        self._add_relocs(self.elf.get_section_by_name('.rela.text'))
+
+    def _add_relocs(self, section):
+        sym_values = {}
+        sym_section = self.elf.get_section_by_name('.symtab')
+
+        for reloc in section.iter_relocations():
+            entry = reloc.entry
+            #print(entry)
+
+            sym_id = entry['r_info_sym']
+            try:
+                sym_value, sym_name = sym_values[sym_id]
+            except KeyError:
+                sym = sym_section.get_symbol(sym_id)
+                sym_value = sym.entry['st_value']
+                sym_name = sym.name
+                sym_values[sym_id] = (sym_value, sym_name)
+            #print(hex(sym_value))
+
+            self.add_reloc(entry['r_info_type'], entry['r_offset'], sym_value+entry['r_addend'], sym_name)
+
+    def add_reloc(self, reltype, addr, target, name="UNKNOWN NAME"):
+        if reltype not in self.VALID_RELOCS:
+            raise ValueError('Unknown/unsupported rel type: %d (%x => %x)' % (reltype, addr, target))
+
+        try:
+            target_id = self._target_lookups[target]
+        except KeyError:
+            target_id = len(self._targets)
+            self._target_lookups[target] = target_id
+            self._targets.append(target)
+        if target <= 0:
+            print("Warning: The following reloc (%x) points to %d: Is this right? %s" % (addr, target, name))
+
+        self._relocs.append((reltype, addr, target_id))
+
+    def build_reloc_data(self):
+        header_struct = struct.Struct('>8sI')
+
+        rel_struct_pack = struct.Struct('>II').pack
+        target_struct_pack = struct.Struct('>I').pack
+
+        rel_data = map(lambda x: rel_struct_pack((x[0] << 24) | x[2], x[1]), self._relocs)
+        target_data = map(target_struct_pack, self._targets)
+
+        header = header_struct.pack(b'NewerREL', 12 + (len(self._relocs) * 8))
+
+        return header + b''.join(rel_data) + b''.join(target_data)
 
 
 
-class KamekModule:
+class KamekModule(object):
     _requiredFields = ['source_files']
 
 
@@ -166,7 +250,8 @@ class KamekModule:
         # load the module data
         self.modulePath = os.path.normpath(filename)
         self.moduleName = os.path.basename(self.modulePath)
-        self.moduleDir = os.path.dirname(self.modulePath)
+        #self.moduleDir = os.path.dirname(self.modulePath)
+        self.moduleDir = 'processed'
 
         with open(self.modulePath, 'r') as f:
             self.rawData = f.read()
@@ -182,7 +267,7 @@ class KamekModule:
 
 
 
-class KamekBuilder:
+class KamekBuilder(object):
     def __init__(self, project, configs):
         self.project = project
         self.configs = configs
@@ -199,7 +284,11 @@ class KamekBuilder:
 
             self._set_config(config)
 
-            self._configTempDir = tempfile.mkdtemp()
+            #self._configTempDir = tempfile.mkdtemp()
+            self._configTempDir = 'tmp'
+            if os.path.isdir('tmp'):
+                shutil.rmtree('tmp')
+            os.mkdir('tmp')
             print_debug('Temp files for this configuration are in: '+self._configTempDir)
 
             if 'dynamic_link' in self._config and self._config['dynamic_link']:
@@ -329,6 +418,7 @@ class KamekBuilder:
             for i in self._config['include_dirs']:
                 cc_command.append('-I%s' % i)
 
+
         self._moduleFiles = []
 
         if fast_hack:
@@ -358,8 +448,6 @@ class KamekBuilder:
                         command = cc_command
 
                     new_command = command + ['-c', '-o', objfile, sourcefile]
-                    if sourcefile.endswith('.c'):
-                        new_command.remove('-std=c++11')
 
                     if 'cc_args' in m.data:
                         new_command += m.data['cc_args']
@@ -408,7 +496,8 @@ class KamekBuilder:
         outname = 'object.plf' if self.dynamic_link_base else 'object.bin'
         self._currentOutFile = '%s/%s_%s' % (self._outDir, nice_name, outname)
 
-        ld_command = ['%s%s-ld' % (gcc_path, gcc_type), '-L.']
+        exe = '.exe' if gcc_append_exe else ''
+        ld_command = ['%s%s-ld%s' % (gcc_path, gcc_type, exe), '-L.']
         ld_command.append('-o')
         ld_command.append(self._currentOutFile)
         if self.dynamic_link_base:
@@ -444,55 +533,54 @@ class KamekBuilder:
 
         self._symbols = []
 
-        file = open(self._currentMapFile, 'r')
+        with open(self._currentMapFile, 'r') as file:
 
-        for line in file:
-            if '__text_start' in line:
-                self._textSegStart = int(line.split()[0],0)
-                break
+            for line in file:
+                if '__text_start' in line:
+                    self._textSegStart = int(line.split()[0],0)
+                    break
 
-        # now read the individual symbols
-        # this is probably a bad method to parse it, but whatever
-        for line in file:
-            if '__text_end' in line:
-                self._textSegEnd = int(line.split()[0],0)
-                break
+            # now read the individual symbols
+            # this is probably a bad method to parse it, but whatever
+            for line in file:
+                if '__text_end' in line:
+                    self._textSegEnd = int(line.split()[0],0)
+                    break
 
-            if not line.startswith('                '): continue
+                if not line.startswith('                '): continue
 
-            sym = line.split()
-            sym[0] = int(sym[0],0)
-            self._symbols.append(sym)
+                sym = line.split()
+                sym[0] = int(sym[0],0)
+                self._symbols.append(sym)
 
-        # we've found __text_end, so now we should be at the output section
-        currentEndAddress = self._textSegEnd
+            # we've found __text_end, so now we should be at the output section
+            currentEndAddress = self._textSegEnd
 
-        for line in file:
-            if line[0] == '.':
-                # probably a segment
-                data = line.split()
-                if len(data) < 3: continue
+            for line in file:
+                if line[0] == '.':
+                    # probably a segment
+                    data = line.split()
+                    if len(data) < 3: continue
 
-                segAddr = int(data[1],0)
-                segSize = int(data[2],0)
+                    segAddr = int(data[1],0)
+                    segSize = int(data[2],0)
 
-                if segAddr+segSize > currentEndAddress:
-                    currentEndAddress = segAddr+segSize
+                    if segAddr+segSize > currentEndAddress:
+                        currentEndAddress = segAddr+segSize
 
-        self._codeStart = self._textSegStart
-        self._codeEnd = currentEndAddress
+            self._codeStart = self._textSegStart
+            self._codeEnd = currentEndAddress
 
-        file.close()
         print_debug('Read, %d symbol(s) parsed' % len(self._symbols))
 
 
         # next up, run it through c++filt
         print_debug('Running c++filt')
-        p = subprocess.Popen('%s%s-c++filt' % (gcc_path, gcc_type), stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+        p = subprocess.Popen('%s/powerpc-eabi-c++filt.exe' % (gcc_path), stdin=subprocess.PIPE, stdout=subprocess.PIPE)
 
         symbolNameList = [sym[1] for sym in self._symbols]
-        filtResult = p.communicate('\n'.join(symbolNameList).encode())
-        filteredSymbols = filtResult[0].decode().split('\n')
+        filtResult = p.communicate('\n'.join(symbolNameList).encode('utf-8'))
+        filteredSymbols = filtResult[0].decode('utf-8').split('\n')
 
         for sym, filt in zip(self._symbols, filteredSymbols):
             sym.append(filt.strip())
@@ -504,8 +592,8 @@ class KamekBuilder:
     def find_func_by_symbol(self, find_symbol):
         for sym in self._symbols:
             #if show_cmd:
-            #    out = "0x%08x - %s - %s" % (sym[0], sym[1], sym[2])
-            #    print_debug(out)
+            #   out = "0x%08x - %s - %s" % (sym[0], sym[1], sym[2])
+            #   print_debug(out)
             if sym[2] == find_symbol:
                 return sym[0]
 
@@ -533,46 +621,38 @@ class KamekBuilder:
 
         if self.dynamic_link:
             # put together the dynamic link files
-            dlcode = open('%s/%s_dlcode.bin' % (self._outDir, nice_name), 'wb')
-            dlcode.write(self.dynamic_link.code)
-            dlcode.close()
+            with open('%s/%s_dlcode.bin' % (self._outDir, nice_name), 'wb') as dlcode:
+                dlcode.write(self.dynamic_link.code)
 
-            dlrelocs = open('%s/%s_dlrelocs.bin' % (self._outDir, nice_name), 'wb')
-            dlrelocs.write(self.dynamic_link.build_reloc_data())
-            dlrelocs.close()
+            with open('%s/%s_dlrelocs.bin' % (self._outDir, nice_name), 'wb') as dlrelocs:
+                dlrelocs.write(self.dynamic_link.build_reloc_data())
 
         else:
             # add the outfile as a patch if not using dynamic linking
-            file = open(self._currentOutFile, 'rb')
-            patch = (self._codeStart, file.read())
-            file.close()
+            with open(self._currentOutFile, 'rb') as file:
+                patch = (self._codeStart, file.read())
 
             self._patches.append(patch)
 
         # generate a Riivolution patch
-        riiv = open('%s/%s_riiv.xml' % (self._outDir, nice_name), 'w')
-        for patch in self._patches:
-            riiv.write(generate_riiv_mempatch(*patch) + '\n')
-
-        riiv.close()
+        with open('%s/%s_riiv.xml' % (self._outDir, nice_name), 'w') as riiv:
+            for patch in self._patches:
+                riiv.write(generate_riiv_mempatch(*patch) + '\n')
 
         # generate an Ocarina patch
-        ocarina = open('%s/%s_ocarina.txt' % (self._outDir, nice_name), 'w')
-        for patch in self._patches:
-            ocarina.write(generate_ocarina_patch(*patch) + '\n')
-
-        ocarina.close()
+        with open('%s/%s_ocarina.txt' % (self._outDir, nice_name), 'w') as ocarina:
+            for patch in self._patches:
+                ocarina.write(generate_ocarina_patch(*patch) + '\n')
 
         # generate a KamekPatcher patch
-        kpatch = open('%s/%s_loader.bin' % (self._outDir, nice_name), 'wb')
-        kpatch.write(generate_kamek_patches(self._patches))
-        kpatch.close()
+        with open('%s/%s_loader.bin' % (self._outDir, nice_name), 'wb') as kpatch:
+            kpatch.write(generate_kamek_patches(self._patches))
 
         print_debug('Patches generated')
 
 
 
-class KamekProject:
+class KamekProject(object):
     _requiredFields = ['output_dir', 'modules']
 
 
@@ -580,7 +660,7 @@ class KamekProject:
         # load the project data
         self.projectPath = os.path.abspath(filename)
         self.projectName = os.path.basename(self.projectPath)
-        self.projectDir = os.path.dirname(self.projectPath)
+        self.projectDir = '' #os.path.dirname(self.projectPath)
 
         with open(self.projectPath, 'r') as f:
             self.rawData = f.read()
@@ -614,7 +694,7 @@ class KamekProject:
 
 def main():
     print(version_str)
-    print()
+    print('')
 
     if len(sys.argv) < 2:
         print('No input file specified')

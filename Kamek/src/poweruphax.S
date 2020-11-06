@@ -1006,6 +1006,7 @@ InsertLostG3D:
 	lis r4, g3d@h
 	ori r4, r4, g3d@l
 	blr
+
 .data
 wait2: .string "wait2"
 

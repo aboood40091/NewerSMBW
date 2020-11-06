@@ -144,8 +144,8 @@ u8 hijackMusicWithSongName(const char *songName, int themeID, bool hasFast, int 
 		OSReport("It has been set to: channel count %d, track bitfield 0x%x\n", thing[0], thing[1]);
 	}
 
-	sprintf(BrsarInfoOffset(stream->stringOffset), "new/%s.er", songName);
-	sprintf(BrsarInfoOffset(stream->stringOffsetFast), hasFast?"new/%s_F.er":"new/%s.er", songName);
+	sprintf(BrsarInfoOffset(stream->stringOffset), "stream/%s.brstm", songName);
+	sprintf(BrsarInfoOffset(stream->stringOffsetFast), hasFast?"stream/%s_F.brstm":"stream/%s.brstm", songName);
 
 	// update filesizes
 	FixFilesize(stream->stringOffset);

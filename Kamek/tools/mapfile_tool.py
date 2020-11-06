@@ -8,9 +8,6 @@
 def make_hex_offset(offs):
     return '0x%08X' % offs
 
-def fix_offs_pal_v1(offs):
-    return offs
-
 def fix_offs_pal_v2(offs):
     if offs >= 0x800CF6E8 and offs <= 0x800CF90F:
         return offs + 8
@@ -291,10 +288,12 @@ def work_on_hook(hook, id, func):
 def do_module(src, dest):
     m = yaml.safe_load(open(src, 'r').read())
 
-    if 'hooks' in m:
-        for id, func in fix_for.items():
-            for hook in m['hooks']:
-                work_on_hook(hook, id, func)
+    if 'hooks' not in m:
+        return
+
+    for id, func in fix_for.items():
+        for hook in m['hooks']:
+            work_on_hook(hook, id, func)
 
     open(dest, 'w').write(yaml.dump(m))
 
@@ -309,19 +308,15 @@ def do_project(f, already_done):
 
 
 def main():
-    do_mapfile('kamek_base.x', 'kamek_pal.x', fix_offs_pal_v1)
-    do_mapfile('kamek_base.x', 'kamek_pal2.x', fix_offs_pal_v2)
-    do_mapfile('kamek_base.x', 'kamek_ntsc.x', fix_offs_ntsc_v1)
-    do_mapfile('kamek_base.x', 'kamek_ntsc2.x', fix_offs_ntsc_v2)
-    do_mapfile('kamek_base.x', 'kamek_jpn.x', fix_offs_jpn_v1)
-    do_mapfile('kamek_base.x', 'kamek_jpn2.x', fix_offs_jpn_v2)
+    do_mapfile('kamek_pal.x', 'kamek_pal2.x', fix_offs_pal_v2)
+    do_mapfile('kamek_pal.x', 'kamek_ntsc.x', fix_offs_ntsc_v1)
+    do_mapfile('kamek_pal.x', 'kamek_ntsc2.x', fix_offs_ntsc_v2)
+    do_mapfile('kamek_pal.x', 'kamek_jpn.x', fix_offs_jpn_v1)
+    do_mapfile('kamek_pal.x', 'kamek_jpn2.x', fix_offs_jpn_v2)
 
     already_done = set()
-    do_project('NewerProject.yaml', already_done)
     do_project('NewerProjectKP.yaml', already_done)
-    do_project('SummerSun.yaml', already_done)
-
-    do_module('anotherhax.yaml', 'processed/anotherhax.yaml')
 
 if __name__ == '__main__':
     main()
+
