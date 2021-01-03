@@ -2198,12 +2198,12 @@ public:
 	u8 *spriteByteStorage;
 	u16 *spriteShortStorage;
 	union {
-        u16 spriteFlagNum;
+		u16 spriteFlagNum;
 
-        struct {
-            u8 eventId2;
-            u8 eventId1;
-        };
+		struct {
+			u8 eventId2; // nybble 1-2
+			u8 eventId1; // nybble 3-4
+		};
 	};
 	u64 spriteFlagMask;
 	u32 _360;
