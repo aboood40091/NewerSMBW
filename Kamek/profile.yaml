@@ -17,7 +17,7 @@ hooks:
     target_func: 'SpriteList_r9'
   - name: SpriteList_r9_nop
     type: nop_insn
-    area_pal: 0x80068dfc
+    area_pal: 0x80068e0c
 
   - name: SpriteList_r3
     type: branch_insn

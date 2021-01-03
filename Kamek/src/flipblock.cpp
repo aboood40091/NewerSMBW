@@ -33,7 +33,7 @@ public:
 	static dActor_c *build();
 };
 
-const SpriteData flipBlockSpriteData = { ProfileId::FlipBlockTest, 8, -8 , 0 , 0, 0x100, 0x100, 0, 0, 0, 0, 0 };
+const SpriteData flipBlockSpriteData = { ProfileId::FlipBlockTest, 8, -8 , 0 , 0, 0x100, 0x100, 0, 0, 0, 0, 0x008 };
  // Using WM_GRID as the execute order profile ID fixes bugs; original FlipBlock uses it as well
 Profile flipBlockProfile(&daEnFlipBlock_c::build, SpriteId::FlipBlockTest, flipBlockSpriteData, ProfileId::WM_GRID, ProfileId::FlipBlockTest, "FlipBlockTest", FlipBlockFileList);
 
