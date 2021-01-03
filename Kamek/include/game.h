@@ -2205,7 +2205,7 @@ public:
 			u8 eventId1; // nybble 3-4
 		};
 	};
-	u64 spriteFlagMask;
+	u64 spriteFlagMask; // 0 if both eventId2 and eventId1 are 0, otherwise "1ULL << ((eventId2 ? eventId2 : eventId1) - 1)"
 	u32 _360;
 	u16 spriteSomeFlag;
 	u8 _366, _367;
