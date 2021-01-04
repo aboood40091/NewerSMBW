@@ -1,16 +1,17 @@
 #include <common.h>
 #include <game.h>
 #include <g3dhax.h>
+#include <profileid.h>
 #include <sfx.h>
 #include "boss.h"
 
 extern "C" void *SoundRelatedClass;
 extern "C" void *MapSoundPlayer(void *SoundRelatedClass, int soundID, int unk);
-
+extern "C" void dAcPy_vf3F8(void* player, dEn_c* monster, int t);
 
 const char* SSarcNameList [] = {
 	"Shynja",
-	NULL	
+	NULL
 };
 
 void ChucksAndKnucks(ActivePhysics *apThis, ActivePhysics *apOther);
@@ -110,7 +111,7 @@ daSamurshai *daSamurshai::build() {
 ////////////////////////
 
 	void ChucksAndKnucks(ActivePhysics *apThis, ActivePhysics *apOther) {
-		if (((dEn_c*)apOther->owner)->name == PLAYER)
+		if (((dEn_c*)apOther->owner)->profileId == ProfileId::PLAYER)
 			((dEn_c*)apThis->owner)->_vf220(apOther->owner);
 	}
 
@@ -132,17 +133,17 @@ daSamurshai *daSamurshai::build() {
 			apOther->someFlagByte |= 2;
 		} else if (hitType > 0) {
 			apOther->someFlagByte |= 2;
-			if (this->isDown == 0) { 
+			if (this->isDown == 0) {
 				this->playEnemyDownSound1();
 				damage += 5;
 				if (damage >= 15) { doStateChange(&StateID_Outro); }
 				else { doStateChange(&StateID_Damage); }
 			}
-		} 
+		}
 		else {
 			this->dEn_c::playerCollision(apThis, apOther);
 			this->_vf220(apOther->owner);
-		} 
+		}
 
 		deathInfo.isDead = 0;
 		this->flags_4FC |= (1<<(31-7));
@@ -156,7 +157,7 @@ daSamurshai *daSamurshai::build() {
 	bool daSamurshai::collisionCat7_GroundPound(ActivePhysics *apThis, ActivePhysics *apOther) {
 		apOther->someFlagByte |= 2;
 
-		if (this->isDown == 0) { 
+		if (this->isDown == 0) {
 			damage += 5;
 			if (damage >= 15) { doStateChange(&StateID_Outro); }
 			else { doStateChange(&StateID_Damage); }
@@ -172,7 +173,7 @@ daSamurshai *daSamurshai::build() {
 		return this->collisionCat7_GroundPound(apThis, apOther);
 	}
 	bool daSamurshai::collisionCat9_RollingObject(ActivePhysics *apThis, ActivePhysics *apOther) {
-		if (this->isDown == 0) { 
+		if (this->isDown == 0) {
 			damage += 3;
 			if (damage >= 15) { doStateChange(&StateID_Outro); }
 			else { doStateChange(&StateID_Damage); }
@@ -190,7 +191,7 @@ daSamurshai *daSamurshai::build() {
 		this->counter_504[apOther->owner->which_player] = 0;
 		return true;
 	}
-	bool daSamurshai::collisionCat14_YoshiFire(ActivePhysics *apThis, ActivePhysics *apOther){ 
+	bool daSamurshai::collisionCat14_YoshiFire(ActivePhysics *apThis, ActivePhysics *apOther){
 		//damage += 4;
 		//SpawnEffect("Wm_mr_fireball_hit", 0, &apOther->owner->pos, &apOther->owner->rot, &apOther->owner->scale);
 		//PlaySoundAsync(this, SE_OBJ_FIREBALL_DISAPP);
@@ -200,7 +201,7 @@ daSamurshai *daSamurshai::build() {
 	bool daSamurshai::collisionCat1_Fireball_E_Explosion(ActivePhysics *apThis, ActivePhysics *apOther) {
 		//damage += 1;
 		//SpawnEffect("Wm_mr_fireball_hit", 0, &apOther->owner->pos, &apOther->owner->rot, &apOther->owner->scale);
-		//PlaySoundAsync(this, SE_OBJ_FIREBALL_DISAPP);		
+		//PlaySoundAsync(this, SE_OBJ_FIREBALL_DISAPP);
 		//if (damage >= 15) { doStateChange(&StateID_Outro); }
 		return true;
 	}
@@ -241,7 +242,7 @@ daSamurshai *daSamurshai::build() {
 				isBouncing = true;
 
 			speed.y = 0.0f;
-		} 
+		}
 
 		// Bouncing checks
 		if (_34A & 4) {
@@ -304,7 +305,7 @@ int daSamurshai::onCreate() {
 		rot.y = 0xD800; // Y is horizontal axis
 		rot.z = 0; // Z is ... an axis >.>
 		direction = 1; // Heading left.
-		
+
 		speed.x = 0.0;
 		speed.y = 0.0;
 		XSpeed = 2.5;
@@ -319,7 +320,7 @@ int daSamurshai::onCreate() {
 		HitMeBaby.yDistToCenter = 15.0;
 
 		HitMeBaby.xDistToEdge = 13.0;
-		HitMeBaby.yDistToEdge = 15.0;		
+		HitMeBaby.yDistToEdge = 15.0;
 
 		HitMeBaby.category1 = 0x3;
 		HitMeBaby.category2 = 0x0;
@@ -413,7 +414,7 @@ void daSamurshai::updateModelMatrices() {
 ///////////////
 // Intro State
 ///////////////
-	void daSamurshai::beginState_Intro() { 
+	void daSamurshai::beginState_Intro() {
 		this->timer = 0;
 
 		// Stop the BGM Music
@@ -438,28 +439,28 @@ void daSamurshai::updateModelMatrices() {
 		pos.y = pos.y + 320.0;
 
 		// Create And use Kameck
-		Kameck = (daKameckDemo*)createChild(KAMECK_FOR_CASTLE_DEMO, (dStageActor_c*)this, 0, &KamekPos, &KamekRot, 0);
+		Kameck = (daKameckDemo*)createChild(ProfileId::KAMECK_FOR_CASTLE_DEMO, (dStageActor_c*)this, 0, &KamekPos, &KamekRot, 0);
 		Kameck->doStateChange(&daKameckDemo::StateID_DemoSt);
 		Kameck->pos.x = Kameck->pos.x - 32.0;
 	}
 
-	void daSamurshai::executeState_Intro() { 
+	void daSamurshai::executeState_Intro() {
 		this->timer += 1;
 
 		OSReport("Timer: %d", timer);
-		if (timer == 230) { bindAnimChr_and_setUpdateRate("c18_INTRO", 1, 0.0, 1.0); } 
+		if (timer == 230) { bindAnimChr_and_setUpdateRate("c18_INTRO", 1, 0.0, 1.0); }
 
 		if ((timer > 220) && (timer < 240)) {
 			pos.x += (224.0 / 20.0);
 			pos.y -= (320.0 / 20.0);
 		}
 
-		if (timer == 230) { 
+		if (timer == 230) {
 			SpawnEffect("Wm_en_hanapetal", 0, &pos, &(S16Vec){0,0,0}, &(Vec){1.5, 1.5, 1.5});
 			SpawnEffect("Wm_ob_itemget_ring", 0, &(Vec){pos.x, pos.y + 16.0, pos.z}, &(S16Vec){0,0,0}, &(Vec){8.0, 0.1, 1.5});
 			MapSoundPlayer(SoundRelatedClass, SE_OBJ_WOOD_BOX_BREAK, 1);
 			MapSoundPlayer(SoundRelatedClass, SE_BOSS_KAMECK_DOWN, 1);
-			this->Kameck->doStateChange(&daKameckDemo::StateID_DieFall);	
+			this->Kameck->doStateChange(&daKameckDemo::StateID_DieFall);
 		}
 
 		if ((timer > 230) && (timer < 350)) {
@@ -475,19 +476,19 @@ void daSamurshai::updateModelMatrices() {
 
 		if (timer == 400) { bindAnimChr_and_setUpdateRate("c18_IDLE_R", 1, 0.0, 1.0); }
 
-		if (timer == 500) { 
+		if (timer == 500) {
 			MapSoundPlayer(SoundRelatedClass, SE_BOSS_WENDY_RING_BOUND, 1);
 			walkStateIsCharging = false;
-			doStateChange(&StateID_Walk); 
+			doStateChange(&StateID_Walk);
 		}
 	}
-	void daSamurshai::endState_Intro() { 
+	void daSamurshai::endState_Intro() {
 		CleanupKameck(this, Kameck);
 
 		rot.y = 0xD800; // Y is horizontal axis
 		direction = 1; // Heading left.
 		XSpeed = 2.0;
-		max_speed.x = 50.0;		
+		max_speed.x = 50.0;
 	}
 
 ///////////////
@@ -508,9 +509,9 @@ void daSamurshai::updateModelMatrices() {
 
 	void daSamurshai::beginState_Walk() {
 		Chuckles.removeFromList();
-		Knuckles.removeFromList();	
+		Knuckles.removeFromList();
 
-		bindAnimChr_and_setUpdateRate(walkStateIsCharging ? "c18_CHARGE" : "c18_RUNNING", 1, 0.0, 0.5); 
+		bindAnimChr_and_setUpdateRate(walkStateIsCharging ? "c18_CHARGE" : "c18_RUNNING", 1, 0.0, 0.5);
 		chosenOne = GetSpecificPlayerActor(this->randomPlayer());
 
 		speed.x = (this->direction) ? -this->XSpeed : this->XSpeed;
@@ -523,7 +524,7 @@ void daSamurshai::updateModelMatrices() {
 
 		OSReport("Speed: %f / %f", speed.x, max_speed.x);
 	}
-	void daSamurshai::executeState_Walk() { 
+	void daSamurshai::executeState_Walk() {
 		MapSoundPlayer(SoundRelatedClass, SE_EMY_MOUSE_WALK, 1);
 
 		float xDistance = pos.x - chosenOne->pos.x;
@@ -558,7 +559,7 @@ void daSamurshai::updateModelMatrices() {
 
 		// Aerial Attacks!
 		if (!walkStateIsCharging && yDistance < -24.0) {
-			
+
 			// Condition For Spin Attack
 			// if (xDistance < 32.0) { doStateChange(&StateID_SpinAttack); }
 
@@ -567,7 +568,7 @@ void daSamurshai::updateModelMatrices() {
 				doStateChange(&StateID_Uppercut);
 		}
 
-		bool ret = calculateTileCollisions(); 
+		bool ret = calculateTileCollisions();
 		if (ret) {
 			doStateChange(&StateID_Turn);
 		}
@@ -582,12 +583,12 @@ void daSamurshai::updateModelMatrices() {
 // Turn State
 ///////////////
 	void daSamurshai::beginState_Turn() {
-		bindAnimChr_and_setUpdateRate("c18_RUNNING", 1, 0.0, 0.5); 
+		bindAnimChr_and_setUpdateRate("c18_RUNNING", 1, 0.0, 0.5);
 		this->speed.x = (direction) ? 0.5f : -0.5f;
 		this->direction ^= 1;
 		x_speed_inc = 0.0;
 	}
-	void daSamurshai::executeState_Turn() { 
+	void daSamurshai::executeState_Turn() {
 
 		if(this->chrAnimation.isAnimationDone()) {
 			this->chrAnimation.setCurrentFrame(0.0);
@@ -605,31 +606,31 @@ void daSamurshai::updateModelMatrices() {
 ///////////////
 // Chop State
 ///////////////
-	void daSamurshai::beginState_Chop() { 
+	void daSamurshai::beginState_Chop() {
 		bindAnimChr_and_setUpdateRate("c18_H_CUT_R", 1, 0.0, 1.0);
 		chrAnimation.setCurrentFrame(0.0);
 		timer = 0;
-		
+
 	}
-	void daSamurshai::executeState_Chop() { 
+	void daSamurshai::executeState_Chop() {
 
 		speed.x = speed.x / 1.5;
 
 		if (chrAnimation.getCurrentFrame() == 15.0) {
 			MapSoundPlayer(SoundRelatedClass, SE_EMY_CRASHER_PUNCH, 1);
-			if (this->direction == 1) { 
+			if (this->direction == 1) {
 				SpawnEffect("Wm_ob_itemget_ring", 0, &(Vec){pos.x - 18.0, pos.y + 16.0, pos.z-200.0}, &(S16Vec){0,0,0}, &(Vec){2.5, 0.5, 1.5});
 				Chuckles.addToList();
 			}
 			else {
 				SpawnEffect("Wm_ob_itemget_ring", 0, &(Vec){pos.x + 18.0, pos.y + 16.0, pos.z-200.0}, &(S16Vec){0,0,0}, &(Vec){2.5, 0.5, 1.5});
 				Knuckles.addToList();
-			}	
+			}
 		}
 
 		if (chrAnimation.getCurrentFrame() == 20.0) {
 			MapSoundPlayer(SoundRelatedClass, SE_OBJ_WOOD_BOX_BREAK, 1);
-			if (this->direction == 1) { 
+			if (this->direction == 1) {
 				SpawnEffect("Wm_en_hit", 0, &(Vec){pos.x - 38.0, pos.y + 16.0, pos.z}, &(S16Vec){0,0,0}, &(Vec){1.0, 1.0, 1.0});
 				SpawnEffect("Wm_en_hanapetal", 0, &(Vec){pos.x - 38.0, pos.y + 16.0, pos.z}, &(S16Vec){0,0,0}, &(Vec){2.0, 2.0, 2.0});
 				Chuckles.removeFromList();
@@ -637,7 +638,7 @@ void daSamurshai::updateModelMatrices() {
 			else {
 				SpawnEffect("Wm_en_hit", 0, &(Vec){pos.x + 38.0, pos.y + 16.0, pos.z}, &(S16Vec){0,0,0}, &(Vec){1.0, 1.0, 1.0});
 				SpawnEffect("Wm_en_hanapetal", 0, &(Vec){pos.x + 38.0, pos.y + 16.0, pos.z}, &(S16Vec){0,0,0}, &(Vec){2.0, 2.0, 2.0});
-				Knuckles.removeFromList();	
+				Knuckles.removeFromList();
 			}
 		}
 
@@ -654,13 +655,13 @@ void daSamurshai::updateModelMatrices() {
 ///////////////
 // ChargeSlash State
 ///////////////
-	void daSamurshai::beginState_ChargeSlash() { 
+	void daSamurshai::beginState_ChargeSlash() {
 		timer = 0;
 		slowDown = false;
 		topHurts = false;
 		speed.x = 0.0;
 	}
-	void daSamurshai::executeState_ChargeSlash() { 
+	void daSamurshai::executeState_ChargeSlash() {
 
 		// End if the animation is finally over
 		if ((chrAnimation.isAnimationDone()) && (slowDown) ) {
@@ -683,10 +684,10 @@ void daSamurshai::updateModelMatrices() {
 		if (timer == 500) { speed.x = speed.x / 1.05; return; }
 
 		// Begin the charge effect
-		if (timer == 0) { bindAnimChr_and_setUpdateRate("c18_OB_IDLE_R", 1, 0.0, 0.5); 
+		if (timer == 0) { bindAnimChr_and_setUpdateRate("c18_OB_IDLE_R", 1, 0.0, 0.5);
 			if (direction == 1)
 				SpawnEffect("Wm_ob_keyget02_lighit", 0, &(Vec){pos.x + 7.0, pos.y + 14.0, pos.z - 5500.0}, &(S16Vec){0,0,0}, &(Vec){0.8, 0.8, 0.8});
-			else 
+			else
 				SpawnEffect("Wm_ob_keyget02_lighit", 0, &(Vec){pos.x - 7.0, pos.y + 14.0, pos.z + 5500.0}, &(S16Vec){0,0,0}, &(Vec){0.8, 0.8, 0.8});
 		}
 
@@ -700,7 +701,7 @@ void daSamurshai::updateModelMatrices() {
 		if (timer == 72) { topHurts = true; }
 
 		OSReport("Speed: %f @ %d", speed.x, timer);
-		float absSpeed; 
+		float absSpeed;
 		if (speed.x < 0.0) { absSpeed = -speed.x; }
 		else			   { absSpeed =  speed.x; }
 
@@ -712,7 +713,7 @@ void daSamurshai::updateModelMatrices() {
 			// Slow that horsey down, tiger
 			if (slowDown) { speed.x = speed.x / 1.5; return; }
 
-			effect.spawn("Wm_mr_p_iceslip", 0, &(Vec){pos.x, pos.y+8.0, pos.z}, &(S16Vec){0,0,0}, &(Vec){1.5, 1.5, 1.5});			
+			effect.spawn("Wm_mr_p_iceslip", 0, &(Vec){pos.x, pos.y+8.0, pos.z}, &(S16Vec){0,0,0}, &(Vec){1.5, 1.5, 1.5});
 			SpawnEffect("Wm_en_hanapetal", 0, &pos, &(S16Vec){0,0,0}, &(Vec){1.5, 1.5, 1.5});
 			SpawnEffect("Wm_ob_itemget_ring", 0, &(Vec){pos.x, pos.y + 16.0, pos.z}, &(S16Vec){0,0,0}, &(Vec){4.0, 0.1, 1.5});
 
@@ -721,30 +722,30 @@ void daSamurshai::updateModelMatrices() {
 			// float xDistance = pos.x - chosenOne->pos.x;
 
 			// // direction 1 is going left, direction 0 is going right
-			// if ((xDistance > 0) && (direction == 0)) { 
+			// if ((xDistance > 0) && (direction == 0)) {
 			// 	SpawnEffect("Wm_ob_itemget_ring", 0, &(Vec){pos.x, pos.y + 16.0, pos.z}, &(S16Vec){0,0,0}, &(Vec){4.0, 0.1, 1.5});
 			// 	slowDown = true; }
 
-			// if ((xDistance < 0) && (direction == 1)) { 
+			// if ((xDistance < 0) && (direction == 1)) {
 			// 	SpawnEffect("Wm_ob_itemget_ring", 0, &(Vec){pos.x, pos.y + 16.0, pos.z}, &(S16Vec){0,0,0}, &(Vec){4.0, 0.1, 1.5});
 			// 	slowDown = true; }
 		}
 
 		this->timer += 1;
 	}
-	void daSamurshai::endState_ChargeSlash() { 
+	void daSamurshai::endState_ChargeSlash() {
 		slowDown = false;
 	}
 
 ///////////////
 // Uppercut State
 ///////////////
-	void daSamurshai::beginState_Uppercut() { 
+	void daSamurshai::beginState_Uppercut() {
 		bindAnimChr_and_setUpdateRate("c18_H_SHOT_R", 1, 0.0, 2.0);
 		slowDown = false;
 		timer = 0;
 	}
-	void daSamurshai::executeState_Uppercut() { 
+	void daSamurshai::executeState_Uppercut() {
 
 		if ((slowDown) && (this->chrAnimation.isAnimationDone())) {
 			timer++;
@@ -766,19 +767,19 @@ void daSamurshai::updateModelMatrices() {
 			speed.y = 4.0;
 			y_speed_inc = -0.1875;
 
-			if (this->direction == 1) { 
+			if (this->direction == 1) {
 				effect.spawn("Wm_ob_itemget_ring", 0, &(Vec){pos.x - 48.0, pos.y + 32.0, pos.z}, &(S16Vec){0,0,0}, &(Vec){0.5, 1.5, 1.5});
 				Chuckles.addToList();
 			}
 			else {
 				effect.spawn("Wm_ob_itemget_ring", 0, &(Vec){pos.x + 48.0, pos.y + 32.0, pos.z}, &(S16Vec){0,0,0}, &(Vec){0.5, 1.5, 1.5});
 				Knuckles.addToList();
-			}	
+			}
 		}
 
 		if (this->chrAnimation.getCurrentFrame() == 64.0) {
 			if (topHurts) {
-				if (this->direction == 1) { 
+				if (this->direction == 1) {
 					SpawnEffect("Wm_en_hit", 0, &(Vec){pos.x - 38.0, pos.y + 16.0, pos.z}, &(S16Vec){0,0,0}, &(Vec){1.0, 1.0, 1.0});
 					SpawnEffect("Wm_en_hanapetal", 0, &(Vec){pos.x - 38.0, pos.y + 16.0, pos.z}, &(S16Vec){0,0,0}, &(Vec){2.0, 2.0, 2.0});
 					Chuckles.removeFromList();
@@ -786,7 +787,7 @@ void daSamurshai::updateModelMatrices() {
 				else {
 					SpawnEffect("Wm_en_hit", 0, &(Vec){pos.x + 38.0, pos.y + 16.0, pos.z}, &(S16Vec){0,0,0}, &(Vec){1.0, 1.0, 1.0});
 					SpawnEffect("Wm_en_hanapetal", 0, &(Vec){pos.x + 38.0, pos.y + 16.0, pos.z}, &(S16Vec){0,0,0}, &(Vec){2.0, 2.0, 2.0});
-					Knuckles.removeFromList();	
+					Knuckles.removeFromList();
 				}
 
 				MapSoundPlayer(SoundRelatedClass, SE_OBJ_WOOD_BOX_BREAK, 1);
@@ -795,13 +796,13 @@ void daSamurshai::updateModelMatrices() {
 		}
 
 		if ((this->chrAnimation.getCurrentFrame() > 34.0) && (speed.y == 0)) {
-			speed.x = 0.0f; 
+			speed.x = 0.0f;
 		}
 
-		if ((this->chrAnimation.isAnimationDone()) && (speed.y == 0.0)) { 
+		if ((this->chrAnimation.isAnimationDone()) && (speed.y == 0.0)) {
 			bindAnimChr_and_setUpdateRate("c18_DIVING_STEAL_R", 1, 0.0, 1.0);
 			slowDown = true;
-		}	
+		}
 
 		bool ret = calculateTileCollisions();
 	}
@@ -810,10 +811,10 @@ void daSamurshai::updateModelMatrices() {
 ///////////////
 // SpinAttack State
 ///////////////
-	void daSamurshai::beginState_SpinAttack() { 
+	void daSamurshai::beginState_SpinAttack() {
 		bindAnimChr_and_setUpdateRate("c18_NORMAL_STEAL_R", 1, 0.0, 1.0);
 	}
-	void daSamurshai::executeState_SpinAttack() { 
+	void daSamurshai::executeState_SpinAttack() {
 
 		if((int)this->chrAnimation.getCurrentFrame() == 20) {
 			topHurts = true;
@@ -823,12 +824,12 @@ void daSamurshai::updateModelMatrices() {
 			y_speed_inc = -0.1875;
 
 			if (this->direction == 1) { Chuckles.addToList(); }
-			else { Knuckles.addToList(); }	
+			else { Knuckles.addToList(); }
 		}
 
 		if (((int)chrAnimation.getCurrentFrame() > 20) && ((int)this->chrAnimation.getCurrentFrame() < 60)) {
 			scale = (Vec){1.0, 1.0, 1.0};
-			if (this->direction == 1) { 
+			if (this->direction == 1) {
 				effect.spawn("Wm_mr_spinjump", 0, &(Vec){pos.x - 18.0, pos.y + 16.0, pos.z}, &(S16Vec){0,0,0}, &scale);
 			}
 			else {
@@ -841,7 +842,7 @@ void daSamurshai::updateModelMatrices() {
 			PlaySoundAsync(this, SE_EMY_CRASHER_PUNCH);
 
 			if (this->direction == 1) { Chuckles.removeFromList(); }
-			else { Knuckles.removeFromList(); }	
+			else { Knuckles.removeFromList(); }
 		}
 
 		if ((this->chrAnimation.isAnimationDone()) && (speed.y == 0.0)) {
@@ -852,14 +853,14 @@ void daSamurshai::updateModelMatrices() {
 		bool ret = calculateTileCollisions();
 
 	}
-	void daSamurshai::endState_SpinAttack() { 
+	void daSamurshai::endState_SpinAttack() {
 	}
 
 ///////////////
 // Damage State
 ///////////////
 	void daSamurshai::beginState_Damage() {
-		bindAnimChr_and_setUpdateRate("c18_L_DMG_F_1_R", 1, 0.0, 1.0); 
+		bindAnimChr_and_setUpdateRate("c18_L_DMG_F_1_R", 1, 0.0, 1.0);
 
 		this->max_speed.x = 0;
 		this->speed.x = 0;
@@ -879,9 +880,9 @@ void daSamurshai::updateModelMatrices() {
 		SpawnEffect("Wm_ob_switch", 0, &(Vec){pos.x, pos.y + 16.0, pos.z}, &(S16Vec){0,0,0}, &(Vec){1.0, 1.0, 1.0});
 		MapSoundPlayer(SoundRelatedClass, SE_BOSS_CMN_DAMAGE_DEF, 1);
 	}
-	void daSamurshai::executeState_Damage() { 
+	void daSamurshai::executeState_Damage() {
 		calculateTileCollisions();
-	
+
 		effect.spawn("Wm_en_spindamage", 0, &(Vec){pos.x, pos.y + 40.0, 0}, &(S16Vec){0,0,0}, &(Vec){1.0, 1.0, 1.0});
 
 		if (this->chrAnimation.isAnimationDone()) {
@@ -897,16 +898,16 @@ void daSamurshai::updateModelMatrices() {
 	void daSamurshai::endState_Damage() {
 		aPhysics.addToList();
 
-		this->isDown = 0;		
+		this->isDown = 0;
 		this->rot.y = (direction) ? 0xD800 : 0x2800;
 	}
 
 ///////////////
 // Outro State
 ///////////////
-	void daSamurshai::beginState_Outro() { 
+	void daSamurshai::beginState_Outro() {
 
-		bindAnimChr_and_setUpdateRate("c18_SP_BLOCK_R", 1, 0.0, 1.0); 
+		bindAnimChr_and_setUpdateRate("c18_SP_BLOCK_R", 1, 0.0, 1.0);
 		OutroSetup(this);
 		aPhysics.removeFromList();
 
@@ -929,20 +930,20 @@ void daSamurshai::updateModelMatrices() {
 	void daSamurshai::executeState_Outro() {
 		calculateTileCollisions();
 
-		if (this->dying == 1) { 
+		if (this->dying == 1) {
 
-			if (this->timer > 180) { ExitStage(WORLD_MAP, 0, BEAT_LEVEL, MARIO_WIPE); }
-			if (this->timer == 60) { PlayerVictoryCries(this); }	
-			
+			if (this->timer > 180) { ExitStage(ProfileId::WORLD_MAP, 0, BEAT_LEVEL, MARIO_WIPE); }
+			if (this->timer == 60) { PlayerVictoryCries(this); }
+
 			this->timer += 1;
-			return; 
-		}	
+			return;
+		}
 
 		if ((chrAnimation.getCurrentFrame() == 41.0) || (chrAnimation.getCurrentFrame() == 62.0)) {
 			SpawnEffect("Wm_en_landsmoke_s", 0, &(Vec){pos.x, pos.y - 8.0, pos.z + 500.0}, &(S16Vec){0,0,0}, &(Vec){1.0, 1.0, 1.0});
 		}
 
-		if (chrAnimation.isAnimationDone()) { 
+		if (chrAnimation.isAnimationDone()) {
 			SpawnEffect("Wm_ob_cmnshotstar", 0, &(Vec){pos.x + 8.0, pos.y - 8.0, pos.z + 500.0}, &(S16Vec){0,0,0}, &(Vec){1.75, 1.75, 1.75});
 			SpawnEffect("Wm_mr_wirehit_hit", 0, &(Vec){pos.x + 8.0, pos.y, pos.z + 500.0}, &(S16Vec){0,0,0}, &(Vec){1.0, 1.0, 1.0});
 
@@ -950,9 +951,9 @@ void daSamurshai::updateModelMatrices() {
 			BossGoalForAllPlayers();
 
 			this->dying = 1;
-			this->timer = 0;	
+			this->timer = 0;
 		}
-	
+
 		this->timer += 1;
 	}
 	void daSamurshai::endState_Outro() { }

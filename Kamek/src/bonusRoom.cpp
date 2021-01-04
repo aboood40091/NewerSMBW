@@ -1,7 +1,9 @@
 #include <common.h>
 #include <game.h>
 #include <g3dhax.h>
+#include <profileid.h>
 #include <sfx.h>
+#include <playerAnim.h>
 #include <stage.h>
 
 extern "C" void *MakeMarioEnterDemoMode();
@@ -16,15 +18,15 @@ extern bool NoMichaelBuble;
 
 
 // Controls the tempo for the songs.
-// Lower numbers are faster, by a ratio factor. 
+// Lower numbers are faster, by a ratio factor.
 
 int Tempo[16] = {13,11,12,12,
 				 8,8,7,15,
 				 15,8,10,16,
 				 12,10,8,8};
 
-int Songs[16][4][16][3] = { 
- 
+int Songs[16][4][16][3] = {
+
 	// 15
 
  	// First number is the block, Second is the note/sfx, Third is timing: 30 is one quarter note at 120 bpm, 0,0 ends the sequence
@@ -42,7 +44,7 @@ int Songs[16][4][16][3] = {
 	// Mario Kart DS Theme
 
 	{ // Song 1 - Super Mario Bros Melody |***  |
-		{{3,17,0},{3,17,2},{3,17,6},{1,13,10},{3,17,12},{5,20,16},{0,0,0}}, 
+		{{3,17,0},{3,17,2},{3,17,6},{1,13,10},{3,17,12},{5,20,16},{0,0,0}},
 		{{1,13,0},{5,8,3},{3,5,6},{6,10,9},{7,12,11},{6,11,13},{6,10,14},{0,0,0}},
 		{{1,13,0},{1,13,1},{1,13,3},{1,13,5},{2,15,6},{3,17,8},{1,13,9},{7,10,11},{6,8,12},{0,0,0}},
 		{{1,13,0},{1,13,1},{1,13,3},{1,13,5},{2,15,6},{3,17,7},{0,0,0}}
@@ -52,7 +54,7 @@ int Songs[16][4][16][3] = {
 		{{7,12,0},{7,24,2},{5,9,4},{5,21,6},{6,10,8},{6,22,10},{0,0,0}},
 		{{3,5,0},{3,17,2},{1,2,4},{1,14,6},{2,3,8},{2,15,10},{0,0,0}},
 		{{2,15,0},{1,14,1},{1,13,2},{7,12,3},{2,15,5},{1,14,7},{5,8,9},{4,7,11},{1,13,13},{0,0,0}},
-		{{7,12,0},{4,18,1},{3,17,2},{2,16,3},{6,22,4},{5,21,5},{4,20,6},{2,15,10},{6,11,12},{6,10,14},{5,9,16},{5,8,18},{0,0,0}}		
+		{{7,12,0},{4,18,1},{3,17,2},{2,16,3},{6,22,4},{5,21,5},{4,20,6},{2,15,10},{6,11,12},{6,10,14},{5,9,16},{5,8,18},{0,0,0}}
 	},
 
 	{ // Song 3 - SMB Starman |**   |
@@ -160,7 +162,7 @@ int Songs[16][4][16][3] = {
 	}
 };
 
-const char* Prizes[10][4] = { 
+const char* Prizes[10][4] = {
 	{ "I_kinoko", 		"g3d/I_kinoko.brres", 			"I_kinoko", 			"wait2" },
 	{ "I_fireflower", 	"g3d/I_fireflower.brres", 		"I_fireflower", 		"wait2" },
 	{ "I_propeller", 	"g3d/I_propeller.brres",	 	"I_propeller_model", 	"wait2" },
@@ -207,7 +209,7 @@ const char* SAarcNameList [] = {
 	"block_light",
 	"block_light_color",
 	"I_kinoko_bundle",
-	NULL	
+	NULL
 };
 
 
@@ -287,7 +289,7 @@ int dSongPrize::onCreate() {
 	p = prize;
 
 
-	// Model creation	
+	// Model creation
 	allocator.link(-1, GameHeaps[0], 0, 0x20);
 
 	resFile.data = getResource(Prizes[p][0], Prizes[p][1]);
@@ -311,8 +313,8 @@ int dSongPrize::onCreate() {
 	return true;
 }
 
-int dSongPrize::onDelete() { 
-	return true; 
+int dSongPrize::onDelete() {
+	return true;
 }
 
 int dSongPrize::onExecute() {
@@ -365,7 +367,7 @@ void dSongPrize::beginState_Shrink() {
 
 	keysX[1] = (HermiteKey){ 60.0, pos.x + (30.0 * queue) - 172.0, 1.0 };
 	keysY[1] = (HermiteKey){ 60.0, pos.y + 64.0, 1.0 };
-	keysS[1] = (HermiteKey){ 60.0, 1.0, 0.0 };	
+	keysS[1] = (HermiteKey){ 60.0, 1.0, 0.0 };
 }
 void dSongPrize::executeState_Shrink() {
 	float modX = GetHermiteCurveValue(timer, keysX, Xkey_count);
@@ -385,7 +387,7 @@ void dSongPrize::endState_Shrink() {}
 void dSongPrize::beginState_Spin() {
 	this->timer = 0;
 
-	Xkey_count = 2;	
+	Xkey_count = 2;
 	keysX[0] = (HermiteKey){ 0.0, 0.0, 0.0 };
 	keysX[1] = (HermiteKey){ 20.0, 65535.0, 0.0 };
 }
@@ -396,7 +398,7 @@ void dSongPrize::executeState_Spin() {
 	if (timer == 20) { SpawnEffect("Wm_ob_flagget", 0, &(Vec){pos.x-10.0, pos.y-2.0, pos.z-100.0}, &(S16Vec){0,0,0}, &(Vec){1.0, 1.0, 1.0}); }
 	if (timer == 30) { doStateChange(&StateID_Wait); }
 
-	timer += 1;	
+	timer += 1;
 }
 void dSongPrize::endState_Spin() {}
 
@@ -545,13 +547,13 @@ int dSingAlong::onCreate() {
 	float y = pos.y - 40.0;
 	float z = pos.z;
 
-	SBa = (dSongBlock*)create(WM_KILLER, 1, &(Vec){x-96.0+(32.0*0), y, z}, &rot, 0);
-	SBb = (dSongBlock*)create(WM_KILLER, 2, &(Vec){x-96.0+(32.0*1), y, z}, &rot, 0);
-	SBc = (dSongBlock*)create(WM_KILLER, 3, &(Vec){x-96.0+(32.0*2), y, z}, &rot, 0);
-	SBd = (dSongBlock*)create(WM_KILLER, 4, &(Vec){x-96.0+(32.0*3), y, z}, &rot, 0);
-	SBe = (dSongBlock*)create(WM_KILLER, 5, &(Vec){x-96.0+(32.0*4), y, z}, &rot, 0);
-	SBf = (dSongBlock*)create(WM_KILLER, 6, &(Vec){x-96.0+(32.0*5), y, z}, &rot, 0);
-	SBg = (dSongBlock*)create(WM_KILLER, 7, &(Vec){x-96.0+(32.0*6), y, z}, &rot, 0);
+	SBa = (dSongBlock*)create(ProfileId::WM_KILLER, 1, &(Vec){x-96.0+(32.0*0), y, z}, &rot, 0);
+	SBb = (dSongBlock*)create(ProfileId::WM_KILLER, 2, &(Vec){x-96.0+(32.0*1), y, z}, &rot, 0);
+	SBc = (dSongBlock*)create(ProfileId::WM_KILLER, 3, &(Vec){x-96.0+(32.0*2), y, z}, &rot, 0);
+	SBd = (dSongBlock*)create(ProfileId::WM_KILLER, 4, &(Vec){x-96.0+(32.0*3), y, z}, &rot, 0);
+	SBe = (dSongBlock*)create(ProfileId::WM_KILLER, 5, &(Vec){x-96.0+(32.0*4), y, z}, &rot, 0);
+	SBf = (dSongBlock*)create(ProfileId::WM_KILLER, 6, &(Vec){x-96.0+(32.0*5), y, z}, &rot, 0);
+	SBg = (dSongBlock*)create(ProfileId::WM_KILLER, 7, &(Vec){x-96.0+(32.0*6), y, z}, &rot, 0);
 
 	// // Trigger the intro state
 	state.setState(&StateID_Intro);
@@ -568,7 +570,7 @@ int dSingAlong::onExecute() {
 
 int dSingAlong::onDraw() { return true; }
 
-int dSingAlong::onDelete() { 
+int dSingAlong::onDelete() {
 	instance = 0;
 	return 1;
 }
@@ -617,7 +619,7 @@ void dSingAlong::executeState_Prize() {
 		nw4r::snd::SoundHandle handle;
 		PlaySoundWithFunctionB4(SoundRelatedClass, &handle, SE_MG_IH_PAIR_OK, 1);
 		//PlaySound(this, SE_MG_IH_PAIR_OK); // SE_MG_IH_NICE or SE_MG_UH_NICE
-		
+
 		int p;
 		p = prize[chorus];
 		this->Powerups[p] += 1;
@@ -629,18 +631,18 @@ void dSingAlong::executeState_Prize() {
 		if (chorus == 2) { Pc = PrizeModel; }
 		if (chorus == 3) { Pd = PrizeModel; }
 
-		PrizeModel->doStateChange(&dSongPrize::StateID_Shrink); 
+		PrizeModel->doStateChange(&dSongPrize::StateID_Shrink);
 	}
 
 	if (timer == 0) {
 		chorus += 1;
 
-		if (chorus == 4) { 
+		if (chorus == 4) {
 			if (success != 4)
 				state.setState(&StateID_Failure);
 			else
 				state.setState(&StateID_Win);
-			return; 
+			return;
 		}
 
 		SpawnEffect("Wm_en_blockcloud", 0, &(Vec){pos.x, pos.y+32.0, pos.z+500.0}, &(S16Vec){0,0,0}, &(Vec){1.5, 1.5, 1.5});
@@ -648,7 +650,7 @@ void dSingAlong::executeState_Prize() {
 		PlaySoundWithFunctionB4(SoundRelatedClass, &handle, SE_OBJ_ITEM_APPEAR, 1);
 		//PlaySound(this, SE_OBJ_ITEM_APPEAR); // SE_OBJ_GOOD_ITEM_APPEAR
 
-		PrizeModel = (dSongPrize*)create(WM_SINKSHIP, chorus + (prize[chorus] << 16), &pos, &rot, 0);
+		PrizeModel = (dSongPrize*)create(ProfileId::WM_SINKSHIP, chorus + (prize[chorus] << 16), &pos, &rot, 0);
 	}
 
 	if (timer == -90) {
@@ -664,7 +666,7 @@ void dSingAlong::endState_Prize() {}
 // Call
 CREATE_STATE(dSingAlong, Call);
 
-void dSingAlong::beginState_Call() { 
+void dSingAlong::beginState_Call() {
 	timer = 0;
 	currentNote = 0;
 }
@@ -703,7 +705,7 @@ void dSingAlong::endState_Call() {
 // Response
 CREATE_STATE(dSingAlong, Response);
 
-void dSingAlong::beginState_Response() { 
+void dSingAlong::beginState_Response() {
 	timer = 0;
 	currentNote = 0;
 	isResponding = 1;
@@ -724,13 +726,13 @@ void dSingAlong::endState_Response() {}
 CREATE_STATE(dSingAlong, Mistake);
 
 void dSingAlong::beginState_Mistake() {
-	SBa->unglow(); 
-	SBb->unglow(); 
-	SBc->unglow(); 
-	SBd->unglow(); 
-	SBe->unglow(); 
-	SBf->unglow(); 
-	SBg->unglow(); 
+	SBa->unglow();
+	SBb->unglow();
+	SBc->unglow();
+	SBd->unglow();
+	SBe->unglow();
+	SBf->unglow();
+	SBg->unglow();
 
 	MakeMarioEnterDemoMode();
 	this->timer = 120;
@@ -741,7 +743,7 @@ void dSingAlong::executeState_Mistake() {
 	if (timer == 60) {
 		nw4r::snd::SoundHandle handle;
 		PlaySoundWithFunctionB4(SoundRelatedClass, &handle, SE_MG_IH_NOPAIR_NG, 1);
-		
+
 		SpawnEffect("Wm_en_blockcloud", 0, &(Vec){pos.x, pos.y+32.0, pos.z+500.0}, &(S16Vec){0,0,0}, &(Vec){1.5, 1.5, 1.5});
 		PrizeModel->Delete(1);
 	}
@@ -756,7 +758,7 @@ void dSingAlong::executeState_Mistake() {
 		nw4r::snd::SoundHandle handle;
 		PlaySoundWithFunctionB4(SoundRelatedClass, &handle, SE_OBJ_ITEM_APPEAR, 1);
 
-		PrizeModel = (dSongPrize*)create(WM_SINKSHIP, chorus + (prize[chorus] << 16), &pos, &rot, 0);
+		PrizeModel = (dSongPrize*)create(ProfileId::WM_SINKSHIP, chorus + (prize[chorus] << 16), &pos, &rot, 0);
 	}
 
 	if (timer == -90) {
@@ -769,12 +771,12 @@ void dSingAlong::endState_Mistake() {
 
 	if (chorus != 4) {
 		SBa->isDead = 0;
-		SBb->isDead = 0; 
-		SBc->isDead = 0; 
-		SBd->isDead = 0; 
-		SBe->isDead = 0; 
-		SBf->isDead = 0; 
-		SBg->isDead = 0; 	
+		SBb->isDead = 0;
+		SBc->isDead = 0;
+		SBd->isDead = 0;
+		SBe->isDead = 0;
+		SBf->isDead = 0;
+		SBg->isDead = 0;
 	}
 }
 
@@ -799,7 +801,7 @@ void dSingAlong::executeState_Failure() {
 				if (dAcPy_c *player = dAcPy_c::findByID(i)) {
 					player->setAnimePlayWithAnimID(dm_glad);
 					player->setFlag(0x24);
-				}   
+				}
 		}
 	}
 
@@ -865,7 +867,7 @@ void dSingAlong::executeState_Failure() {
 	// Add the powerups and exit the stage
 	if (timer == 30*9) {
 		this->addPowerups();
-		ExitStage(WORLD_MAP, 0, BEAT_LEVEL, MARIO_WIPE);
+		ExitStage(ProfileId::WORLD_MAP, 0, BEAT_LEVEL, MARIO_WIPE);
 	}
 	timer += 1;
 }
@@ -946,7 +948,7 @@ void dSingAlong::executeState_Win() {
 	// Add the powerups and exit the stage
 	if (timer == 30*11) {
 		this->addPowerups();
-		ExitStage(WORLD_MAP, 0, BEAT_LEVEL, MARIO_WIPE);
+		ExitStage(ProfileId::WORLD_MAP, 0, BEAT_LEVEL, MARIO_WIPE);
 	}
 	timer += 1;
 }
@@ -1003,7 +1005,7 @@ int dSongBlock::onCreate() {
 	this->standAlone = (this->settings >> 4) & 0xF;
 	this->item = (this->settings >> 16) & 0xFF;
 
-	// Model creation	
+	// Model creation
 	allocator.link(-1, GameHeaps[0], 0, 0x20);
 
 	char modelName [24];
@@ -1152,7 +1154,7 @@ void dSongBlock::blockWasHit(bool isDown) {
 	SpawnEffect("Wm_ob_keyget02_lighit", 0, &(Vec){pos.x, pos.y+8.0, pos.z-100.0}, &(S16Vec){0,0,0}, &(Vec){0.5, 0.5, 0.5});
 
 	if (item > 0) {
-		create(EN_ITEM, item, &(Vec){pos.x, pos.y, pos.z}, &rot, 0);
+		create(ProfileId::EN_ITEM, item, &(Vec){pos.x, pos.y, pos.z}, &rot, 0);
 	}
 
 	if (standAlone) {
@@ -1180,7 +1182,7 @@ void dSongBlock::blockWasHit(bool isDown) {
 
 	physics.setup(this, &physicsInfo, 3, currentLayerID);
 	physics.addToList();
-	
+
 	doStateChange(&StateID_Wait);
 }
 

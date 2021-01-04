@@ -1,6 +1,7 @@
 #include <common.h>
 #include <game.h>
 #include <g3dhax.h>
+#include <profileid.h>
 #include <sfx.h>
 #include <stage.h>
 #include "boss.h"
@@ -22,7 +23,7 @@ extern bool HackyBombDropVariable;
 void BowserDoomSpriteCollision(dEn_c *bowser, ActivePhysics *apThis, ActivePhysics *apOther) {
 	// If you collide with something or other, call the fireball collision
 
-	if (apOther->owner->name == 674) {
+	if (apOther->owner->profileId == ProfileId::WM_SMALLCLOUD) {
 
 		if (lastBomb == apOther->owner->id) { return; }
 		if (!HackyBombDropVariable) return;
@@ -48,10 +49,10 @@ void BowserDoomSpriteCollision(dEn_c *bowser, ActivePhysics *apThis, ActivePhysi
 			// this->vf300(otherActor);
 			BowserDamageEnd(bowser);
 
-			// daBossKoopaDemo_c *BowserDemo = (daBossKoopaDemo_c*)FindActorByType(BOSS_KOOPA_DEMO, 0);
+			// daBossKoopaDemo_c *BowserDemo = (daBossKoopaDemo_c*)fBase_c::searchByProfileId(ProfileId::BOSS_KOOPA_DEMO, 0);
 			daBossKoopa_c *BowserClass = (daBossKoopa_c*)bowser;
 			OSReport("Koopa Controller: %x", BowserClass);
-			BowserClass->doStateChange(&daBossKoopa_c::StateID_Fall);	
+			BowserClass->doStateChange(&daBossKoopa_c::StateID_Fall);
 			dFlagMgr_c::instance->set(3, 0, true, false, false);
 
 			BridgeBowserHP = 2;
@@ -79,7 +80,7 @@ void BowserDoomSpriteCollision(dEn_c *bowser, ActivePhysics *apThis, ActivePhysi
 void BowserDoomStart(dStageActor_c *Controller) {
 	OSReport("Here we go!");
 
-	dEn_c *Bowser = (dEn_c*)FindActorByType(EN_BOSS_KOOPA, 0);
+	dEn_c *Bowser = (dEn_c*)fBase_c::searchByProfileId(ProfileId::EN_BOSS_KOOPA, 0);
 	Bowser->Delete(1);
 	lastBomb = 0;
 }

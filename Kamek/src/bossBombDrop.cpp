@@ -1,13 +1,14 @@
 #include <common.h>
 #include <game.h>
 #include <g3dhax.h>
+#include <profileid.h>
 #include <sfx.h>
 #include "boss.h"
 
 
 const char* BDarcNameList [] = {
 	"koopa_clown_bomb",
-	NULL	
+	NULL
 };
 
 
@@ -38,7 +39,7 @@ class dDroppedBomb : public dEn_c {
 	bool collisionCat7_GroundPound(ActivePhysics *apThis, ActivePhysics *apOther);
 };
 
-void dDroppedBomb::playerCollision(ActivePhysics *apThis, ActivePhysics *apOther) { 
+void dDroppedBomb::playerCollision(ActivePhysics *apThis, ActivePhysics *apOther) {
 	DamagePlayer(this, apThis, apOther);
 	this->kill();
 }
@@ -61,11 +62,11 @@ void dDroppedBomb::kill() {
 
 	SpawnEffect("Wm_en_explosion", 0, &this->pos, &(S16Vec){0,0,0}, &(Vec){1.0, 1.0, 1.0});
 	SpawnEffect("Wm_mr_wirehit", 0, &this->pos, &(S16Vec){0,0,0}, &(Vec){1.25, 1.25, 1.25});
-	this->Delete(1);	
+	this->Delete(1);
 }
 
 int dDroppedBomb::onCreate() {
-	
+
 	allocator.link(-1, GameHeaps[0], 0, 0x20);
 
 	nw4r::g3d::ResFile rf(getResource("koopa_clown_bomb", "g3d/koopa_clown_bomb.brres"));
@@ -73,10 +74,10 @@ int dDroppedBomb::onCreate() {
 	SetupTextures_Enemy(&bodyModel, 0);
 
 	allocator.unlink();
-	
-	
+
+
 	ActivePhysics::Info KoopaJunk;
-	
+
 	KoopaJunk.xDistToCenter = -20.0f;
 	KoopaJunk.yDistToCenter = 0.0;
 	KoopaJunk.xDistToEdge = 20.0f;
@@ -85,7 +86,7 @@ int dDroppedBomb::onCreate() {
 	this->scale.x = 1.0;
 	this->scale.y = 1.0;
 	this->scale.z = 1.0;
-	
+
 	KoopaJunk.category1 = 0x3;
 	KoopaJunk.category2 = 0x0;
 	KoopaJunk.bitfield1 = 0x4F;
@@ -206,14 +207,14 @@ extern int BridgeBowserHP;
 
 int dBombDrop::onCreate() {
 	BridgeBowserHP = 2;
-	
+
 	int t = this->settings & 0xF;
 	this->eventA = ((this->settings >> 24) & 0xFF) - 1;
 	this->eventB = ((this->settings >> 16) & 0xFF) - 1;
 
 
 	if (t == 0) {
-		target = (dStageActor_c*)FindActorByType(EN_BOSS_KOOPA, 0);
+		target = (dStageActor_c*)fBase_c::searchByProfileId(ProfileId::EN_BOSS_KOOPA, 0);
 	}
 	else {
 		target = GetSpecificPlayerActor(t - 1);
@@ -223,7 +224,7 @@ int dBombDrop::onCreate() {
 	dFlagMgr_c::instance->set(eventB, 0, false, false, false);
 
 	HackyBombDropVariable = false;
-	
+
 	return true;
 }
 
@@ -236,14 +237,14 @@ int dBombDrop::onExecute() {
 	bool active;
 	active = dFlagMgr_c::instance->active(eventA);
 	if (active) {
-		create(WM_SMALLCLOUD, eventA+1, &pos , &rot, 0);
+		create(ProfileId::WM_SMALLCLOUD, eventA+1, &pos , &rot, 0);
 		HackyBombDropVariable = true;
 		dFlagMgr_c::instance->set(eventA, 0, false, false, false);
 	}
 
 	active = dFlagMgr_c::instance->active(eventB);
 	if (active) {
-		create(WM_SMALLCLOUD, eventB+1, &pos, &rot, 0);
+		create(ProfileId::WM_SMALLCLOUD, eventB+1, &pos, &rot, 0);
 		HackyBombDropVariable = true;
 		dFlagMgr_c::instance->set(eventB, 0, false, false, false);
 	}

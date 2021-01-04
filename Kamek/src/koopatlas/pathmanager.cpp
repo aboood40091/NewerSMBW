@@ -3,6 +3,8 @@
 #include "koopatlas/hud.h"
 #include "koopatlas/player.h"
 #include "koopatlas/map.h"
+#include "koopatlas/camera.h"
+#include <profileid.h>
 #include <sfx.h>
 #include <stage.h>
 
@@ -245,7 +247,7 @@ void dWMPathManager_c::setup() {
 		}
 		if (CanFinishWorld && flag == totalFlag) {
 			shouldRequestSave = true;
-			completionMessageType = CMP_MSG_WORLD; 
+			completionMessageType = CMP_MSG_WORLD;
 		}
 
 		if (CanFinishAlmostAllCoins) {
@@ -544,7 +546,7 @@ void dWMPathManager_c::unlockPaths() {
 			if ((PathAvailabilityData[i] > 0) && (forceFlag || oldPathAvData[i] == 0)) {
 				if (forceFlag && PathAvailabilityData[i] == dKPPath_s::ALWAYS_AVAILABLE)
 					continue;
-	
+
 				dKPPath_s *path = pathLayer->paths[i];
 				path->isAvailable = dKPPath_s::NEWLY_AVAILABLE;
 				newlyAvailablePaths++;
@@ -642,21 +644,23 @@ bool dWMPathManager_c::evaluateUnlockCondition(u8 *&in, SaveBlock *save, int sta
 		u8 subConditionType = controlByte & 0x3F;
 		switch (subConditionType) {
 			case 0: case 1: case 2: case 3:
-				u8 one = *(in++);
-				u8 two = *(in++);
+				{
+					u8 one = *(in++);
+					u8 two = *(in++);
 
-				int compareOne = (one & 0x80) ? cachedUnspentStarCoinCount : cachedTotalStarCoinCount;
-				int compareTwo = ((one & 0x7F) << 8) | two;
+					int compareOne = (one & 0x80) ? cachedUnspentStarCoinCount : cachedTotalStarCoinCount;
+					int compareTwo = ((one & 0x7F) << 8) | two;
 
-				switch (subConditionType) {
-					case 0:
-						return compareOne == compareTwo;
-					case 1:
-						return compareOne != compareTwo;
-					case 2:
-						return compareOne < compareTwo;
-					case 3:
-						return compareOne > compareTwo;
+					switch (subConditionType) {
+						case 0:
+							return compareOne == compareTwo;
+						case 1:
+							return compareOne != compareTwo;
+						case 2:
+							return compareOne < compareTwo;
+						case 3:
+							return compareOne > compareTwo;
+					}
 				}
 
 			case 15:
@@ -831,7 +835,7 @@ void dWMPathManager_c::execute() {
 				dKPNode_s *node = pathLayer->nodes[i];
 
 				if (node->isNew && node->type == dKPNode_s::LEVEL) {
-					Vec efPos = {node->x, -node->y, 3300.0f};
+					Vec efPos = {float(node->x), float(-node->y), 3300.0f};
 					S16Vec efRot = {0x2000,0,0};
 					Vec efScale = {0.8f,0.8f,0.8f};
 					SpawnEffect("Wm_cs_pointlight", 0, &efPos, &efRot, &efScale);
@@ -998,7 +1002,7 @@ void dWMPathManager_c::execute() {
 				startMovementTo(currentNode->exits[pressedDir]);
 			} else {
 				// TODO: maybe remove this? got to see how it looks
-				static u16 directions[] = {-0x4000,0x4000,-0x7FFF,0};
+				static s16 directions[] = {-0x4000,0x4000,-0x7FFF,0};
 				daWMPlayer_c::instance->setTargetRotY(directions[pressedDir]);
 			}
 		} else if (nowPressed & WPAD_TWO) {
@@ -1099,7 +1103,7 @@ void dWMPathManager_c::startMovementTo(dKPPath_s *path) {
 	if (path->animation == dKPPath_s::ENTER_CAVE_UP) {
 		scaleAnimProgress = 60;
 		// what direction does this path go in?
-		static u16 directions[] = {-0x4000,0x4000,-0x7FFF,0};
+		static s16 directions[] = {-0x4000,0x4000,-0x7FFF,0};
 		isScalingUp = (deltaY < 0) ^ reverseThroughPath;
 
 		if (!isScalingUp)
@@ -1263,7 +1267,7 @@ void dWMPathManager_c::moveThroughPath(int pressedDir) {
 	}
 
 
-	Vec move = (Vec){to->x - from->x, to->y - from->y, 0};
+	Vec move = (Vec){float(to->x - from->x), float(to->y - from->y), 0};
 	VECNormalize(&move, &move);
 	VECScale(&move, &move, moveSpeed);
 
@@ -1446,7 +1450,7 @@ void dWMPathManager_c::moveThroughPath(int pressedDir) {
 			u32 saveFlag = (shouldRequestSave ? 0x80000 : 0);
 			saveFlag |= (checkedForMoveAfterEndLevel ? 0x40000 : 0);
 			saveFlag |= (afterFortressMode ? 0x20000 : 0);
-			DoSceneChange(WORLD_MAP, 0x10000000 | (to->foreignID << 20) | saveFlag, 0);
+			DoSceneChange(ProfileId::WORLD_MAP, 0x10000000 | (to->foreignID << 20) | saveFlag, 0);
 
 		} else if (reallyStop) {
 			// Stop here
@@ -1474,7 +1478,7 @@ void dWMPathManager_c::moveThroughPath(int pressedDir) {
 					movingAgain = true;
 				} else {
 					// TODO: maybe remove this? got to see how it looks
-					static u16 directions[] = {-0x4000,0x4000,-0x7FFF,0};
+					static s16 directions[] = {-0x4000,0x4000,-0x7FFF,0};
 					daWMPlayer_c::instance->setTargetRotY(directions[pressedDir]);
 				}
 			}
@@ -1535,7 +1539,7 @@ void dWMPathManager_c::activatePoint() {
 			u32 conds = save->GetLevelCondition(w, l);
 
 			SpammyReport("Toad House Flags: %x", conds);
-			if (conds & 0x30) { 
+			if (conds & 0x30) {
 				nw4r::snd::SoundHandle something;
 				PlaySoundWithFunctionB4(SoundRelatedClass, &something, SE_SYS_INVALID, 1);
 				return;

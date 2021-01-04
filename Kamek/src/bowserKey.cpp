@@ -1,6 +1,7 @@
 #include <common.h>
 #include <game.h>
 #include <g3dhax.h>
+#include <profileid.h>
 #include <sfx.h>
 #include <stage.h>
 #include "boss.h"
@@ -14,7 +15,7 @@ void endKeyLevel(dStageActor_c *key) {
 	if (key->settings) {
 		KeyCounter += 1;
 		OSReport("Key Counter now at: %d", KeyCounter);
-		ExitStage(WORLD_MAP, 0, BEAT_LEVEL, MARIO_WIPE);
+		ExitStage(ProfileId::WORLD_MAP, 0, BEAT_LEVEL, MARIO_WIPE);
 	}
 }
 

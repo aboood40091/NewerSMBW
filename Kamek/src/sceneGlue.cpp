@@ -1,4 +1,5 @@
 #include <game.h>
+#include <profileid.h>
 #include <stage.h>
 
 extern char CurrentLevel, CurrentWorld;
@@ -32,6 +33,6 @@ extern "C" void EnterOpeningLevel() {
 	RESTART_CRSIN_LevelStartStruct.areaMaybe = 0;
 	RESTART_CRSIN_LevelStartStruct.entrance = 0xFF;
 	RESTART_CRSIN_LevelStartStruct.unk4 = 0; // load replay
-	DoSceneChange(RESTART_CRSIN, 0, 0);
+	DoSceneChange(ProfileId::RESTART_CRSIN, 0, 0);
 }
 

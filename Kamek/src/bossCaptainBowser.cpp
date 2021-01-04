@@ -1,8 +1,10 @@
 #include <common.h>
 #include <game.h>
 #include <g3dhax.h>
+#include <profileid.h>
 #include <sfx.h>
 #include <stage.h>
+#include <playerAnim.h>
 #include "boss.h"
 
 extern "C" void *StageScreen;
@@ -39,7 +41,7 @@ const char* CBarcNameList [] = {
 	"choropoo",
 	"koopa_clown_bomb",
 	"dossun",
-	NULL	
+	NULL
 };
 
 
@@ -181,13 +183,13 @@ bool daCaptainBowser::collisionCat13_Hammer(ActivePhysics *apThis, ActivePhysics
 }
 
 void daCaptainBowser::spriteCollision(ActivePhysics *apThis, ActivePhysics *apOther) {
-	if (apOther->owner->name == WM_PAKKUN) { //time to get hurt
+	if (apOther->owner->profileId == ProfileId::WM_PAKKUN) { //time to get hurt
 		if (this->isInvulnerable) {
 			return;
 		}
 		this->damage -= 1;
 
-		spawnHitEffectAtPosition((Vec2){apOther->owner->pos.x, apOther->owner->pos.y});		
+		spawnHitEffectAtPosition((Vec2){apOther->owner->pos.x, apOther->owner->pos.y});
 
 		SpawnEffect("Wm_en_burst_m", 0, &apOther->owner->pos, &(S16Vec){0,0,0}, &(Vec){1.0, 1.0, 1.0});
 		PlaySound(apOther->owner, SE_BOSS_CMN_STOMPED);
@@ -220,8 +222,8 @@ int daCaptainBowser::onCreate() {
 	shipRotY = 0x4000;
 	sinTimerXRunning = true;
 	sinTimerYRunning = true;
-	
-	// Model creation	
+
+	// Model creation
 	allocator.link(-1, GameHeaps[0], 0, 0x20);
 
 	// B-b-b-bad boy Bowsaa
@@ -301,7 +303,7 @@ int daCaptainBowser::onCreate() {
 	BowserPhysics.callback = &dEn_c::collisionCallback;
 
 	this->aPhysics.initWithStruct(this, &BowserPhysics);
-	
+
 
 
 	// State Changers
@@ -324,7 +326,7 @@ int daCaptainBowser::afterExecute(int param) {
 int daCaptainBowser::onExecute() {
 	if (forceClownEnds) {
 		dEn_c *clownIter = 0;
-		while (clownIter = (dEn_c*)dEn_c::search(JR_CLOWN_FOR_PLAYER, clownIter)) {
+		while (clownIter = (dEn_c*)dEn_c::searchByProfileId(ProfileId::JR_CLOWN_FOR_PLAYER, clownIter)) {
 			clownIter->counter_500 = 120; // what a terrible hack.
 			float *pPropRotationIncrement = (float*)(((u32)clownIter) + 0x740);
 			*pPropRotationIncrement = 30.0f;
@@ -375,7 +377,7 @@ int daCaptainBowser::onExecute() {
 	if(this->shipAnm.isAnimationDone() && acState.getCurrentState() != &StateID_Outro && acState.getCurrentState() != &StateID_PanToExit) {
 		this->shipAnm.setCurrentFrame(0.0);
 	}
-	
+
 	return true;
 }
 
@@ -423,17 +425,17 @@ int daCaptainBowser::onDraw() {
 //////////////////
 	void daCaptainBowser::beginState_Intro() {
 		this->timer = 0;
-		bindAnimChr_and_setUpdateRate("kp_wait", 1, 0.0, 1.5); 
+		bindAnimChr_and_setUpdateRate("kp_wait", 1, 0.0, 1.5);
 		this->isInvulnerable = 1;
 		roarLen = 300;
 	}
-	void daCaptainBowser::executeState_Intro() { 
+	void daCaptainBowser::executeState_Intro() {
 
-		if (this->chrAnimation.isAnimationDone()) { 
+		if (this->chrAnimation.isAnimationDone()) {
 			// End the intro
 			if (this->isIntro == 1) {
 				OSReport("We're done: %d", this->timer);
-				doStateChange(&StateID_Wait); 
+				doStateChange(&StateID_Wait);
 				return;
 			}
 			this->chrAnimation.setCurrentFrame(0.0); }
@@ -466,9 +468,9 @@ int daCaptainBowser::onDraw() {
 		}
 
 		// Bowser does a shitty roar
-		if (this->timer == (roarLen - 190 + 420)) { 
-			this->isIntro = 1; 
-			bindAnimChr_and_setUpdateRate("kp_roar3", 1, 0.0, 1.0); 
+		if (this->timer == (roarLen - 190 + 420)) {
+			this->isIntro = 1;
+			bindAnimChr_and_setUpdateRate("kp_roar3", 1, 0.0, 1.0);
 		}
 		if (this->timer > (roarLen - 190 + 420)) {
 
@@ -476,7 +478,7 @@ int daCaptainBowser::onDraw() {
 				PlaySound(this, SE_VOC_KP_L_SHOUT);
 			}
 
-			if (this->chrAnimation.getCurrentFrame() > 53.0) { 
+			if (this->chrAnimation.getCurrentFrame() > 53.0) {
 				ShakeScreen(StageScreen, 2, 2, 0, 0);
 				effect.spawn("Wm_ko_shout", 0, &(Vec){pos.x-182.0, pos.y+132.0, pos.z}, &(S16Vec){0,0,0x7000}, &(Vec){1.0, 1.0, 1.0});
 			}
@@ -484,9 +486,9 @@ int daCaptainBowser::onDraw() {
 
 		this->timer++;
 	}
-	void daCaptainBowser::endState_Intro() { 
+	void daCaptainBowser::endState_Intro() {
 
-		this->aPhysics.addToList();	
+		this->aPhysics.addToList();
 
 		this->isInvulnerable = 0;
 		this->isIntro = 0;
@@ -498,24 +500,24 @@ int daCaptainBowser::onDraw() {
 //////////////////
 	void daCaptainBowser::beginState_Wait() {
 		if (this->isAngry == 0) {
-			bindAnimChr_and_setUpdateRate("kp_wait", 1, 0.0, 1.5); 
+			bindAnimChr_and_setUpdateRate("kp_wait", 1, 0.0, 1.5);
 		}
 		else {
-			bindAnimChr_and_setUpdateRate("kp_wait", 1, 0.0, 2.0); 
+			bindAnimChr_and_setUpdateRate("kp_wait", 1, 0.0, 2.0);
 		}
 	}
-	void daCaptainBowser::executeState_Wait() { 
+	void daCaptainBowser::executeState_Wait() {
 
-	if (this->chrAnimation.isAnimationDone()) { 
-		this->chrAnimation.setCurrentFrame(0.0); 
+	if (this->chrAnimation.isAnimationDone()) {
+		this->chrAnimation.setCurrentFrame(0.0);
 
 		int num = GenerateRandomNumber(4);
 
 		if (num == 0) {
-			doStateChange(&StateID_Fire); 		
+			doStateChange(&StateID_Fire);
 		}
 		else{
-			doStateChange(&StateID_Throw); 		
+			doStateChange(&StateID_Throw);
 		}
 	}
 
@@ -527,31 +529,31 @@ int daCaptainBowser::onDraw() {
 // State Throw
 //////////////////
 	void daCaptainBowser::beginState_Throw() {
-		bindAnimChr_and_setUpdateRate("break", 1, 0.0, 1.0); 
+		bindAnimChr_and_setUpdateRate("break", 1, 0.0, 1.0);
 		this->timer = 0;
 	}
-	void daCaptainBowser::executeState_Throw() { 
+	void daCaptainBowser::executeState_Throw() {
 
 		if (this->chrAnimation.getCurrentFrame() == 60.0) { // throw back
 			int num = GenerateRandomNumber(4);
-			CreateActor(0x29F, 0x101 + ((num + 1) * 0x10), (Vec){pos.x+bowserX, pos.y+bowserY, pos.z}, 0, 0);
+			CreateActor(ProfileId::WM_ANCHOR, 0x101 + ((num + 1) * 0x10), (Vec){pos.x+bowserX, pos.y+bowserY, pos.z}, 0, 0);
 		}
 
 		if (this->chrAnimation.getCurrentFrame() == 126.0) { // throw front
 			int num = GenerateRandomNumber(4);
-			CreateActor(0x29F, ((num + 1) * 0x10) + 1, (Vec){pos.x+bowserX, pos.y+bowserY, pos.z}, 0, 0);
+			CreateActor(ProfileId::WM_ANCHOR, ((num + 1) * 0x10) + 1, (Vec){pos.x+bowserX, pos.y+bowserY, pos.z}, 0, 0);
 		}
 
-		if (this->chrAnimation.isAnimationDone()) { 
+		if (this->chrAnimation.isAnimationDone()) {
 			this->chrAnimation.setCurrentFrame(0.0);
 			if (this->isAngry == 1) {
 				if (this->timer == 1) {
-					doStateChange(&StateID_Wait); 
+					doStateChange(&StateID_Wait);
 				}
-			}	
+			}
 			else {
-				doStateChange(&StateID_Wait); 
-			}		
+				doStateChange(&StateID_Wait);
+			}
 
 			this->timer++;
 		}
@@ -564,26 +566,26 @@ int daCaptainBowser::onDraw() {
 // State Fire
 //////////////////
 	void daCaptainBowser::beginState_Fire() {
-		bindAnimChr_and_setUpdateRate("fire1", 1, 0.0, 1.5); 
+		bindAnimChr_and_setUpdateRate("fire1", 1, 0.0, 1.5);
 		this->timer = 0;
 	}
-	void daCaptainBowser::executeState_Fire() { 
+	void daCaptainBowser::executeState_Fire() {
 
 		if (this->chrAnimation.getCurrentFrame() == 70.5) { // spit fire
 			PlaySound(this, SE_BOSS_KOOPA_L_FIRE_SHOT);
-			CreateActor(WM_ANTLION, 0, (Vec){pos.x-172.0, pos.y+152.0, pos.z}, 0, 0);
+			CreateActor(ProfileId::WM_ANTLION, 0, (Vec){pos.x-172.0, pos.y+152.0, pos.z}, 0, 0);
 		}
 
-		if (this->chrAnimation.isAnimationDone()) { 
+		if (this->chrAnimation.isAnimationDone()) {
 			this->chrAnimation.setCurrentFrame(0.0);
 			if (this->isAngry == 1) {
 				if (this->timer == 1) {
-					doStateChange(&StateID_Wait); 
+					doStateChange(&StateID_Wait);
 				}
-			}	
+			}
 			else {
-				doStateChange(&StateID_Wait); 
-			}		
+				doStateChange(&StateID_Wait);
+			}
 
 			this->timer++;
 		}
@@ -597,11 +599,11 @@ int daCaptainBowser::onDraw() {
 // State Roar
 //////////////////
 	void daCaptainBowser::beginState_Roar() {
-		bindAnimChr_and_setUpdateRate("kp_roar3", 1, 0.0, 1.0); 
+		bindAnimChr_and_setUpdateRate("kp_roar3", 1, 0.0, 1.0);
 		this->isInvulnerable = 1;
 		this->timer = 0;
 	}
-	void daCaptainBowser::executeState_Roar() { 
+	void daCaptainBowser::executeState_Roar() {
 
 		if (this->chrAnimation.getCurrentFrame() == 53.0) { // This is where the smackdown starts
 			nw4r::snd::SoundHandle handle;
@@ -612,12 +614,12 @@ int daCaptainBowser::onDraw() {
 			effect.spawn("Wm_ko_shout", 0, &(Vec){pos.x-174.0, pos.y+140.0, pos.z}, &(S16Vec){0,0,0x7000}, &(Vec){1.0, 1.0, 1.0});
 		}
 
-		if (this->chrAnimation.isAnimationDone()) { 
-			doStateChange(deathSequenceRunning ? &StateID_FinalAttack : &StateID_Wait); 
+		if (this->chrAnimation.isAnimationDone()) {
+			doStateChange(deathSequenceRunning ? &StateID_FinalAttack : &StateID_Wait);
 		}
 
 	}
-	void daCaptainBowser::endState_Roar() { 
+	void daCaptainBowser::endState_Roar() {
 		this->isInvulnerable = 0;
 		this->isAngry = 1;
 	}
@@ -628,16 +630,16 @@ int daCaptainBowser::onDraw() {
 // State Damage
 //////////////////
 	void daCaptainBowser::beginState_Damage() {
-		bindAnimChr_and_setUpdateRate("grow_big", 1, 0.0, 1.0); 
+		bindAnimChr_and_setUpdateRate("grow_big", 1, 0.0, 1.0);
 		this->isInvulnerable = 1;
-		this->chrAnimation.setCurrentFrame(9.0); 
+		this->chrAnimation.setCurrentFrame(9.0);
 
 		PlaySound(this, SE_VOC_KP_DAMAGE_HPDP);
 	}
-	void daCaptainBowser::executeState_Damage() { 
+	void daCaptainBowser::executeState_Damage() {
 
 		if (this->chrAnimation.getCurrentFrame() == 65.0) { // stop it here before it's too late
-			doStateChange(&StateID_Wait); 
+			doStateChange(&StateID_Wait);
 		}
 
 	}
@@ -663,7 +665,7 @@ void daCaptainBowser::initiateDeathSequence() {
 void daCaptainBowser::beginState_FinalAttack() {
 	isInvulnerable = true;
 
-	bindAnimChr_and_setUpdateRate("mastfail", 1, 0.0, 1.0f); 
+	bindAnimChr_and_setUpdateRate("mastfail", 1, 0.0, 1.0f);
 
 	timer = 0;
 	flameScale.x = flameScale.y = flameScale.z = 0.0f;
@@ -754,7 +756,7 @@ void daCaptainBowser::beginState_Outro() {
 	dStage32C_c::instance->freezeMarioBossFlag = 1;
 
 	bowserX += 56.0f;
-	bindAnimChr_and_setUpdateRate("kp_death1", 1, 0.0, 1.0f); 
+	bindAnimChr_and_setUpdateRate("kp_death1", 1, 0.0, 1.0f);
 
 	//shipRotY = -0x4000;
 	shipAnm.bind(&shipModel, shipFile.GetResAnmChr("mastfail_after"), 1);
@@ -779,7 +781,7 @@ void daCaptainBowser::beginState_Outro() {
 extern void *_8042A788;
 extern void playFanfare(void *, int type);
 extern dStateBase_c JrClownEndDemoState;
-void daCaptainBowser::executeState_Outro() { 
+void daCaptainBowser::executeState_Outro() {
 	timer++;
 
 	if (!shipAnmFinished) {
@@ -792,16 +794,16 @@ void daCaptainBowser::executeState_Outro() {
 			while (iter = (dActor_c*)dActor_c::searchByBaseType(2, iter)) {
 				dStageActor_c *sa = (dStageActor_c*)iter;
 
-				if (sa->name == EN_BIRIKYU_MAKER || sa->name == KAZAN_MGR) {
+				if (sa->profileId == ProfileId::EN_BIRIKYU_MAKER || sa->profileId == ProfileId::KAZAN_MGR) {
 					sa->Delete(1);
 				}
 
-				if (sa->name == EN_LINE_BIRIKYU ||
-						sa->name == EN_STAR_COIN ||
-						sa->name == EN_HATENA_BALLOON ||
-						sa->name == EN_ITEM ||
-						sa->name == EN_TARZANROPE || // Meteor
-						sa->name == WM_ANCHOR) { // Koopa Throw
+				if (sa->profileId == ProfileId::EN_LINE_BIRIKYU ||
+						sa->profileId == ProfileId::EN_STAR_COIN ||
+						sa->profileId == ProfileId::EN_HATENA_BALLOON ||
+						sa->profileId == ProfileId::EN_ITEM ||
+						sa->profileId == ProfileId::EN_TARZANROPE || // Meteor
+						sa->profileId == ProfileId::WM_ANCHOR) { // Koopa Throw
 					sa->killedByLevelClear();
 					sa->Delete(1);
 				}
@@ -809,7 +811,7 @@ void daCaptainBowser::executeState_Outro() {
 
 			// freeze ye olde clowne
 			dEn_c *clownIter = 0;
-			while (clownIter = (dEn_c*)dEn_c::search(JR_CLOWN_FOR_PLAYER, clownIter)) {
+			while (clownIter = (dEn_c*)dEn_c::searchByProfileId(ProfileId::JR_CLOWN_FOR_PLAYER, clownIter)) {
 				clownIter->doStateChange(&JrClownEndDemoState);
 			}
 			forceClownEnds = true;
@@ -883,7 +885,7 @@ void daCaptainBowser::executeState_Outro() {
 		dAcPy_c *unsortedClownPlayers[4];
 
 		dEn_c *clownIter = 0;
-		while (clownIter = (dEn_c*)dEn_c::search(JR_CLOWN_FOR_PLAYER, clownIter)) {
+		while (clownIter = (dEn_c*)dEn_c::searchByProfileId(ProfileId::JR_CLOWN_FOR_PLAYER, clownIter)) {
 			dAcPy_c *player = *((dAcPy_c**)(((u32)clownIter) + 0x738));
 			if (player) {
 				unsortedClownPointers[clownCount] = clownIter;
@@ -928,7 +930,7 @@ void daCaptainBowser::executeState_Outro() {
 			dEn_c *clown = clownPointers[i];
 
 			float moveSpeed = 1.2f;
-			
+
 			// Are we there already?
 			float xDiff = abs(clown->pos.x - clownDests[i].x);
 			float yDiff = abs(clown->pos.y - clownDests[i].y);
@@ -1018,7 +1020,7 @@ void daCaptainBowser::executeState_PanToExit() {
 			RESTART_CRSIN_LevelStartStruct.entrance = 0xFF;
 			RESTART_CRSIN_LevelStartStruct.unk4 = 0; // load replay
 			DontShowPreGame = true;
-			ExitStage(RESTART_CRSIN, 0, BEAT_LEVEL, MARIO_WIPE);
+			ExitStage(ProfileId::RESTART_CRSIN, 0, BEAT_LEVEL, MARIO_WIPE);
 			exitedFlag = true;
 
 			for (int i = 0; i < 4; i++)

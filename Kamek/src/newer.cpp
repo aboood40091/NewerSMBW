@@ -12,14 +12,14 @@ int lastLevelIDs[] = {
 
 /*
 extern "C" void FuckUpYoshi(void *_this) {
-	dEn_c *koopa = (dEn_c*)fBase_c::search(EN_NOKONOKO, 0);
+	dEn_c *koopa = (dEn_c*)fBase_c::searchByProfileId(ProfileId::EN_NOKONOKO, 0);
 	static int thing = 0;
 	thing++;
 	nw4r::db::Exception_Printf_("Fruit eaten: %d\n", thing);
 	if (thing == 5) {
 		nw4r::db::Exception_Printf_("5th fruit eaten\n");
 		nw4r::db::Exception_Printf_("Let's try fucking up Yoshi!\n");
-		daPlBase_c *yoshi = (daPlBase_c*)fBase_c::search(YOSHI, 0);
+		daPlBase_c *yoshi = (daPlBase_c*)fBase_c::searchByProfileId(ProfileId::YOSHI, 0);
 		nw4r::db::Exception_Printf_("Fruit: %p ; Koopa: %p ; Yoshi: %p\n", _this, koopa, yoshi);
 		koopa->_vf220(yoshi);
 		nw4r::db::Exception_Printf_("Yoshi fucked up. Yay.\n");
@@ -28,9 +28,9 @@ extern "C" void FuckUpYoshi(void *_this) {
 }
 
 extern "C" void FuckUpYoshi2() {
-	dEn_c *koopa = (dEn_c*)fBase_c::search(EN_NOKONOKO, 0);
+	dEn_c *koopa = (dEn_c*)fBase_c::searchByProfileId(ProfileId::EN_NOKONOKO, 0);
 	nw4r::db::Exception_Printf_("Let's try fucking up Yoshi!\n");
-	daPlBase_c *yoshi = (daPlBase_c*)fBase_c::search(YOSHI, 0);
+	daPlBase_c *yoshi = (daPlBase_c*)fBase_c::searchByProfileId(ProfileId::YOSHI, 0);
 	koopa->_vf220(yoshi);
 	nw4r::db::Exception_Printf_("Yoshi fucked up. Yay.\n");
 }

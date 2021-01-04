@@ -426,7 +426,6 @@ u32 QueryGlobal5758(u32 check);
 
 void SaveGame(void *classDoesntMatter, bool isQuick);
 
-#include <actors.h>
 void *CreateParentedObject(short classID, void *parent, int settings, char something);
 void *CreateChildObject(short classID, void *parent, int settings, int unk1, int unk2);
 
@@ -2040,11 +2039,11 @@ class fBase_c {
 public:
 	u32 id;
 	u32 settings;
-	u16 name;
-	u8 _A;
-	u8 _B;
-	u8 _C;
-	u8 _D;
+	u16 profileId;
+	bool isCreated;
+	bool isDeleted;
+	bool wasNotDeferred;
+	bool isDeferred; // "wasCreationDelayed"
 	u8 base_type;
 	u8 _F;
 	TreeNode link_connect;
@@ -2091,8 +2090,8 @@ public:
 	bool hasUninitialisedProcesses();	// 80162B60
 	fBase_c *findNextUninitialisedProcess();
 
-	static fBase_c *search(Actors name, fBase_c *previous = 0);
-	static fBase_c *search(u32 id);
+	static fBase_c *searchByProfileId(u16 profileId, fBase_c *previous = 0);
+	static fBase_c *searchById(u32 id);
 	static fBase_c *searchByBaseType(int type, fBase_c *previous);
 };
 
@@ -2271,8 +2270,8 @@ public:
 	~dStageActor_c();
 
 
-	static dStageActor_c *create(Actors type, u32 settings, Vec *pos, S16Vec *rot, u8 layer);
-	static dStageActor_c *createChild(Actors type, dStageActor_c *parent, u32 settings, Vec *pos, S16Vec *rot, u8 layer);
+	static dStageActor_c *create(u16 profileId, u32 settings, Vec *pos, S16Vec *rot, u8 layer);
+	static dStageActor_c *createChild(u16 profileId, dStageActor_c *parent, u32 settings, Vec *pos, S16Vec *rot, u8 layer);
 
 	// these are valid while in onCreate
 	static u8 *creatingByteStorage; // 0x80429FF4

@@ -1,6 +1,7 @@
 #include <common.h>
 #include <game.h>
 #include <g3dhax.h>
+#include <profileid.h>
 #include <sfx.h>
 #include <stage.h>
 #include "boss.h"
@@ -243,25 +244,25 @@ int daEnMegaDosun_c::onDelete() {
 
 // Grow State
 
-	void daEnMegaDosun_c::beginState_Grow() { 
+	void daEnMegaDosun_c::beginState_Grow() {
 		this->scale = (Vec){0.5, 0.5, 0.5};
 		this->timer = 0;
 
 		SetupKameck(this, Kameck);
 	}
 
-	void daEnMegaDosun_c::executeState_Grow() { 
-			
+	void daEnMegaDosun_c::executeState_Grow() {
+
 		bool ret;
 		ret = GrowBoss(this, Kameck, 0.5, 1.0, 0, this->timer);
 
-		if (ret) { 	
+		if (ret) {
 			PlaySound(this, SE_EMY_BIG_DOSSUN);
-			doStateChange(&StateID_UpMove); 
-		}	
-		this->timer += 1;		
+			doStateChange(&StateID_UpMove);
+		}
+		this->timer += 1;
 	}
-	void daEnMegaDosun_c::endState_Grow() { 
+	void daEnMegaDosun_c::endState_Grow() {
 		CleanupKameck(this, Kameck);
 	}
 
@@ -281,7 +282,7 @@ int daEnMegaDosun_c::onDelete() {
 		if (this->pos.x > this->rightBuffer) {
 			SpawnEffect("Wm_en_dossunfall02", 0, &(Vec){this->pos.x + 38.0, this->pos.y + 32.0, 5500.0}, &(S16Vec){0,0,0}, &(Vec){1.0, 1.0, 1.0});
 			PlaySoundAsync(this, SE_OBJ_TEKKYU_G_CRASH);
-			
+
 			this->direction = 0;
 		}
 
@@ -300,7 +301,7 @@ int daEnMegaDosun_c::onDelete() {
 				this->speed.y = 0.0;
 			}
 		}
-		
+
 		if (this->timer == 30) {
 			this->notFalling = 0;
 		}
@@ -430,7 +431,7 @@ int daEnMegaDosun_c::onDelete() {
 	}
 
 // Outro
-	void daEnMegaDosun_c::beginState_Outro() { 
+	void daEnMegaDosun_c::beginState_Outro() {
 		OutroSetup(this);
 		this->timer = 0;
 
@@ -455,14 +456,14 @@ int daEnMegaDosun_c::onDelete() {
 			PlaySoundWithFunctionB4(SoundRelatedClass, &handle, STRM_BGM_SHIRO_BOSS_CLEAR, 1);
 			BossGoalForAllPlayers();
 		}
-		
+
 		if (this->timer == 120) {
-			
+
 			PlayerVictoryCries(this);
-		}	
-				
+		}
+
 		if (this->timer > 240) {
-			ExitStage(WORLD_MAP, 0, BEAT_LEVEL, MARIO_WIPE);
+			ExitStage(ProfileId::WORLD_MAP, 0, BEAT_LEVEL, MARIO_WIPE);
 		}
 
 		this->timer += 1;

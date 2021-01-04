@@ -1037,7 +1037,7 @@ StrongboxInit:
 
 .extern continueFromStrongBox2
 .extern AddStockPowerup
-.extern create__13dStageActor_cF6ActorsUiP7Point3dP6S16VecUc
+.extern create__13dStageActor_cFUsUiP7Point3dP6S16VecUc
 .global StrongboxGiveBattleItem
 StrongboxGiveBattleItem:
 	# save a reg we can use
@@ -1074,7 +1074,7 @@ StrongboxGiveBattleItem:
 	addi r5, r1, 0x10
 	li r6, 0
 	li r7, 0
-	bl create__13dStageActor_cF6ActorsUiP7Point3dP6S16VecUc
+	bl create__13dStageActor_cFUsUiP7Point3dP6S16VecUc
 
 	# restore our reg
 	lwz r29, 0x24(r1)

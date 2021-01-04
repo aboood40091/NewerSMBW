@@ -1,5 +1,7 @@
 #include <game.h>
+#include <profileid.h>
 #include <stage.h>
+#include "boss.h"
 #include "msgbox.h"
 
 const char *PalaceDudeFileList[] = {"OpeningScene", 0};
@@ -57,7 +59,7 @@ int dPalaceDude_c::onExecute() {
 				SaveGame(0, false);
 				wmsettings = 0x80000000;
 			}
-			ExitStage(WORLD_MAP, wmsettings, BEAT_LEVEL, MARIO_WIPE);
+			ExitStage(ProfileId::WORLD_MAP, wmsettings, BEAT_LEVEL, MARIO_WIPE);
 			hasExitedStage = true;
 		}
 	}

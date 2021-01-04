@@ -118,7 +118,7 @@ void APDebugDrawer::drawXlu() {
 	ActivePhysics *ap = ActivePhysics::globalListHead;
 
 	while (ap) {
-//		if (ap->owner->name == PLAYER)
+//		if (ap->owner->profileId == ProfileId::PLAYER)
 //			OSReport("Player has : DistToC=%f,%f DistToEdge=%f,%f Pos=%f,%f Scale=%f,%f\n",
 //					ap->info.xDistToCenter, ap->info.yDistToCenter,
 //					ap->info.xDistToEdge, ap->info.yDistToEdge,

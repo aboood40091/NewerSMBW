@@ -1,6 +1,7 @@
 #include <common.h>
 #include <game.h>
 #include <g3dhax.h>
+#include <profileid.h>
 #include <sfx.h>
 #include "boss.h"
 
@@ -113,19 +114,19 @@ void CConExecuteMove(dEn_c *clown) {
 	// OSReport("Clown = %x, %x, %x", (clown)->rot.y, (clown)->rot.x, (clown)->rot.z);
 
 	Vec tempPos;
-	
+
 	u32 buttonPushed = Remocon_GetPressed(GetRemoconMng()->controllers[cPlayerOccupying->which_player]);
 	if (buttonPushed & 0x0100) {
 
 		if (cTimer > 90) {
 			if (clown->direction == 0) { // Going right
 				tempPos = (Vec){clown->pos.x + 32.0, clown->pos.y + 32.0, 3564.0};
-				dStageActor_c *spawned = CreateActor(657, 0, tempPos, 0, 0);
+				dStageActor_c *spawned = CreateActor(ProfileId::WM_PAKKUN, 0, tempPos, 0, 0);
 				spawned->speed.x = 5.0;
 			}
 			else {
 				tempPos = (Vec){clown->pos.x - 32.0, clown->pos.y + 32.0, 3564.0};
-				dStageActor_c *spawned = CreateActor(657, 0, tempPos, 0, 0);
+				dStageActor_c *spawned = CreateActor(ProfileId::WM_PAKKUN, 0, tempPos, 0, 0);
 				spawned->speed.x = -5.0;
 			}
 
@@ -226,12 +227,12 @@ int daClownShot::onCreate() {
 	allocator.unlink();
 
 	ActivePhysics::Info GreatBalls;
-	
+
 	GreatBalls.xDistToCenter = 0.0;
 	GreatBalls.yDistToCenter = 0.0;
 	GreatBalls.xDistToEdge = 8.0;
 	GreatBalls.yDistToEdge = 7.0;
-	
+
 	GreatBalls.category1 = 0x3;
 	GreatBalls.category2 = 0x0;
 	GreatBalls.bitfield1 = 0x6F;
@@ -260,7 +261,7 @@ int daClownShot::onCreate() {
 
 	this->speed.y = 4.0;
 	this->y_speed_inc = -0.1875;
-	
+
 	this->onExecute();
 	return true;
 }
@@ -318,7 +319,7 @@ extern "C" bool Amp_NewPreSpriteCollision(ActivePhysics *apThis, ActivePhysics *
 	if (apOther->info.category2 == 9) {
 		if (amp->collisionCat9_RollingObject(apThis, apOther))
 			return true;
-	} else if (apOther->owner->name == WM_PAKKUN) {
+	} else if (apOther->owner->profileId == ProfileId::WM_PAKKUN) {
 		amp->killByDieFall(apOther->owner);
 		return true;
 	}
@@ -329,7 +330,7 @@ extern "C" bool Amp_NewPreSpriteCollision(ActivePhysics *apThis, ActivePhysics *
 extern "C" void KazanRock_Explode(void *kazanRock);
 extern "C" void KazanRock_OriginalCollisionCallback(ActivePhysics *apThis, ActivePhysics *apOther);
 extern "C" void KazanRock_CollisionCallback(ActivePhysics *apThis, ActivePhysics *apOther) {
-	if (apOther->owner->name == WM_PAKKUN) {
+	if (apOther->owner->profileId == ProfileId::WM_PAKKUN) {
 		apThis->someFlagByte |= 2;
 		KazanRock_Explode(apThis->owner);
 	} else {

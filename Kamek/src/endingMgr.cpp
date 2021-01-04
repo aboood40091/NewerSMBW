@@ -1,7 +1,9 @@
 #include <game.h>
 #include <playerAnim.h>
+#include <profileid.h>
 #include <sfx.h>
 #include <stage.h>
+
 extern void *SoundRelatedClass;
 
 class dEndingMgr_c : public daBossDemo_c {
@@ -204,7 +206,7 @@ void dEndingMgr_c::executeState_JumpOntoSwitch() {
 }
 
 static daEnBossKoopaDemoPeach_c *getPeach() {
-	return (daEnBossKoopaDemoPeach_c*)dEn_c::search(EN_BOSS_KOOPA_DEMO_PEACH);
+	return (daEnBossKoopaDemoPeach_c*)dEn_c::searchByProfileId(ProfileId::EN_BOSS_KOOPA_DEMO_PEACH);
 }
 
 CREATE_STATE(dEndingMgr_c, ThanksPeach);
@@ -293,7 +295,7 @@ void dEndingMgr_c::executeState_ThanksPeach() {
 				RESTART_CRSIN_LevelStartStruct.entrance = 0xFF;
 				RESTART_CRSIN_LevelStartStruct.unk4 = 0; // load replay
 				DontShowPreGame = true;
-				ExitStage(RESTART_CRSIN, 0, BEAT_LEVEL, MARIO_WIPE);
+				ExitStage(ProfileId::RESTART_CRSIN, 0, BEAT_LEVEL, MARIO_WIPE);
 			}
 		}
 	}

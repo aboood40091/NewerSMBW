@@ -1,4 +1,5 @@
 #include "cutScene.h"
+#include <profileid.h>
 
 dScCutScene_c *dScCutScene_c::instance = 0;
 
@@ -16,8 +17,8 @@ dScCutScene_c::dScCutScene_c() {
 	layout = 0;
 	sceneLoaders = 0;
 
-	yesNoWindow = (dYesNoWindow_c*)CreateParentedObject(YES_NO_WINDOW, this, 0, 0);
-	CreateParentedObject(SELECT_CURSOR, this, 0, 0);
+	yesNoWindow = (dYesNoWindow_c*)CreateParentedObject(ProfileId::YES_NO_WINDOW, this, 0, 0);
+	CreateParentedObject(ProfileId::SELECT_CURSOR, this, 0, 0);
 }
 
 dScCutScene_c::~dScCutScene_c() {
@@ -245,7 +246,7 @@ int dScCutScene_c::onExecute() {
 		layout->execAnimations();
 		layout->update();
 	}
-	
+
 	if (nextScene >= 0) {
 		// is this scene loaded yet?
 		if (sceneLoaders[nextScene].buffer) {
@@ -354,7 +355,7 @@ void dScCutScene_c::goToNextScene() {
 			switch (nsmbwMovieType) {
 				case 0:
 					SaveGame(0, false);
-					DoSceneChange(WORLD_MAP, 0x80000000, 0);
+					DoSceneChange(ProfileId::WORLD_MAP, 0x80000000, 0);
 					break;
 				case 1:
 					StartTitleScreenStage(false, 0);
@@ -365,7 +366,7 @@ void dScCutScene_c::goToNextScene() {
 		case 1:
 			// KAMEK (W7 => W8)
 			ActivateWipe(WIPE_MARIO);
-			DoSceneChange(WORLD_MAP, 0x40000000, 0);
+			DoSceneChange(ProfileId::WORLD_MAP, 0x40000000, 0);
 			break;
 	}
 }

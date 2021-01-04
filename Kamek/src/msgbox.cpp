@@ -1,5 +1,6 @@
 #include <common.h>
 #include <game.h>
+#include <sfx.h>
 #include "msgbox.h"
 
 // Replaces: EN_LIFT_ROTATION_HALF (Sprite 107; Profile ID 481 @ 80AF96F8)
@@ -68,7 +69,7 @@ int dMsgBoxManager_c::onDraw() {
 	if (visible) {
 		layout.scheduleForDrawing();
 	}
-	
+
 	return true;
 }
 
@@ -315,7 +316,7 @@ void daEnMsgBlock_c::blockWasHit(bool isDown) {
 
 	physics.setup(this, &physicsInfo, 3, currentLayerID);
 	physics.addToList();
-	
+
 	doStateChange(&StateID_Wait);
 }
 

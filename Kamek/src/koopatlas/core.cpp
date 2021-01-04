@@ -2,8 +2,10 @@
 #include "koopatlas/camera.h"
 #include "koopatlas/player.h"
 #include "music.h"
+#include <profileid.h>
 
 extern "C" void LoadMapScene();
+extern u8 MaybeFinishingLevel[2];
 
 dScKoopatlas_c *dScKoopatlas_c::instance = 0;
 
@@ -225,20 +227,20 @@ bool WMInit_SetupExtra(void *ptr) {
 
 	// first up: player models for Stocked Items
 	for (int i = 0; i < 4; i++) {
-		void *obj = CreateChildObject(WM_2D_PLAYER, wm, i, 0, 0);
+		void *obj = CreateChildObject(ProfileId::WM_2D_PLAYER, wm, i, 0, 0);
 		wm->stockItem->player2d[i] = obj;
 		NPCHG_2DPLAYER(wm->numPeopleChange,i) = obj;
 	}
 
 	// next: items for the Powerup screen
 	for (int i = 0; i < 8; i++) {
-		void *obj = CreateChildObject(WM_ITEM, wm, i, 0, 0);
+		void *obj = CreateChildObject(ProfileId::WM_ITEM, wm, i, 0, 0);
 		wm->stockItem->newItemPtr[i] = obj;
 	}
 
 	// need Player before we can set up paths
 	SpammyReport("creating player\n");
-	wm->player = (daWMPlayer_c*)CreateParentedObject(WM_PLAYER, wm, 0, 2);
+	wm->player = (daWMPlayer_c*)CreateParentedObject(ProfileId::WM_PLAYER, wm, 0, 2);
 	wm->player->modelHandler->mdlClass->setPowerup(Player_Powerup[0]);
 	wm->player->bindPats();
 	wm->player->modelHandler->mdlClass->startAnimation(0, 1.2f, 10.0f, 0.0f);
@@ -253,18 +255,18 @@ bool WMInit_SetupExtra(void *ptr) {
 
 	// is last param correct? must check :/
 	SpammyReport("creating MAP\n");
-	wm->map = (dWMMap_c*)CreateParentedObject(WM_MAP, wm, 0, 0);
+	wm->map = (dWMMap_c*)CreateParentedObject(ProfileId::WM_MAP, wm, 0, 0);
 	SpammyReport("creating HUD\n");
-	wm->hud = (dWMHud_c*)CreateParentedObject(WM_HUD, wm, 0, 0);
+	wm->hud = (dWMHud_c*)CreateParentedObject(ProfileId::WM_HUD, wm, 0, 0);
 	// note: world_camera is not created here
 	// because we require it earlier
 	// it is created in dScKoopatlas_c::onCreate
 
 	SpammyReport("creating SHOP\n");
-	wm->shop = (dWMShop_c*)CreateParentedObject(WM_SHOP, wm, 0, 2);
+	wm->shop = (dWMShop_c*)CreateParentedObject(ProfileId::WM_SHOP, wm, 0, 2);
 
 	SpammyReport("creating Star Coin Menu\n");
-	wm->coins = (dWMStarCoin_c*)CreateParentedObject(WM_STARCOIN, wm, 0, 0);
+	wm->coins = (dWMStarCoin_c*)CreateParentedObject(ProfileId::WM_STARCOIN, wm, 0, 0);
 
 
 	SpammyReport("SetupExtra done\n");
@@ -349,26 +351,26 @@ int dScKoopatlas_c::onCreate() {
 	}
 
 	SpammyReport("select cursor\n");
-	this->selectCursor = CreateParentedObject(SELECT_CURSOR, this, 0, 0);
+	this->selectCursor = CreateParentedObject(ProfileId::SELECT_CURSOR, this, 0, 0);
 
 	SpammyReport("cs menu\n");
-	this->csMenu = CreateParentedObject(COURSE_SELECT_MENU, this, 0, 0);
+	this->csMenu = CreateParentedObject(ProfileId::COURSE_SELECT_MENU, this, 0, 0);
 
 	SpammyReport("yes no window\n");
-	this->yesNoWindow = (dYesNoWindow_c*)CreateParentedObject(YES_NO_WINDOW, this, 0, 0);
+	this->yesNoWindow = (dYesNoWindow_c*)CreateParentedObject(ProfileId::YES_NO_WINDOW, this, 0, 0);
 
 	SpammyReport("number of people change\n");
-	this->numPeopleChange = CreateParentedObject(NUMBER_OF_PEOPLE_CHANGE, this, 0, 0);
+	this->numPeopleChange = CreateParentedObject(ProfileId::NUMBER_OF_PEOPLE_CHANGE, this, 0, 0);
 
 	for (int i = 0; i < 4; i++) {
 		SpammyReport("ccsb %d\n", i);
-		void *ccsb = CreateParentedObject(CHARACTER_CHANGE_SELECT_BASE, this, i, 0);
+		void *ccsb = CreateParentedObject(ProfileId::CHARACTER_CHANGE_SELECT_BASE, this, i, 0);
 		SpammyReport("ccsc %d\n", i);
-		void *ccsc = CreateParentedObject(CHARACTER_CHANGE_SELECT_CONTENTS, this, i, 0);
+		void *ccsc = CreateParentedObject(ProfileId::CHARACTER_CHANGE_SELECT_CONTENTS, this, i, 0);
 		SpammyReport("ccsa %d\n", i);
-		void *ccsa = CreateParentedObject(CHARACTER_CHANGE_SELECT_ARROW, this, i, 0);
+		void *ccsa = CreateParentedObject(ProfileId::CHARACTER_CHANGE_SELECT_ARROW, this, i, 0);
 		SpammyReport("ccsi %d\n", i);
-		void *cci = CreateParentedObject(CHARACTER_CHANGE_INDICATOR, this, i, 0);
+		void *cci = CreateParentedObject(ProfileId::CHARACTER_CHANGE_INDICATOR, this, i, 0);
 
 		NPCHG_CCSB(this->numPeopleChange, i) = ccsb;
 		NPCHG_CCSC(this->numPeopleChange, i) = ccsc;
@@ -377,25 +379,25 @@ int dScKoopatlas_c::onCreate() {
 	}
 
 	SpammyReport("continue\n");
-	this->continueObj = CreateParentedObject(CONTINUE, this, 0, 0);
+	this->continueObj = CreateParentedObject(ProfileId::CONTINUE, this, 0, 0);
 
 	SpammyReport("stock item\n");
-	this->stockItem = (dStockItem_c*)CreateParentedObject(STOCK_ITEM, this, 0, 0);
+	this->stockItem = (dStockItem_c*)CreateParentedObject(ProfileId::STOCK_ITEM, this, 0, 0);
 	SpammyReport("stock item shadow\n");
-	this->stockItemShadow = (dStockItemShadow_c*)CreateParentedObject(STOCK_ITEM_SHADOW, this, 0, 0);
+	this->stockItemShadow = (dStockItemShadow_c*)CreateParentedObject(ProfileId::STOCK_ITEM_SHADOW, this, 0, 0);
 	stockItem->shadow = stockItemShadow;
 
 	SpammyReport("easy pairing\n");
-	this->easyPairing = CreateParentedObject(EASY_PAIRING, this, 0, 0);
+	this->easyPairing = CreateParentedObject(ProfileId::EASY_PAIRING, this, 0, 0);
 
 	SpammyReport("world camera\n");
-	CreateParentedObject(WORLD_CAMERA, this, 0, 0);
+	CreateParentedObject(ProfileId::WORLD_CAMERA, this, 0, 0);
 
 	SpammyReport("setting NewerMapDrawFunc\n");
 	*CurrentDrawFunc = NewerMapDrawFunc;
 
 	SpammyReport("onCreate() completed\n");
-	
+
 	// Prepare this first
 	SaveBlock *save = GetSaveFile()->GetBlock(-1);
 	currentMapID = save->current_world;
@@ -548,7 +550,7 @@ void dScKoopatlas_c::executeState_Normal() {
 	// 		for (int l = 0; l < 6; l++)
 	// 			save->SetLevelCondition(w, l, COND_COIN_ALL);
 #endif
-	} 
+	}
 }
 
 void dScKoopatlas_c::executeState_CSMenu() {

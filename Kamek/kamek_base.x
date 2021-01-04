@@ -120,8 +120,8 @@ SECTIONS {
 	EnemyBounceValue = 0x8042A5F0;
 
 /* Scrolling is annoying, clown car goes here! */
-	search__7fBase_cFUi = 0x80162E40;
-	search__7fBase_cF6ActorsP7fBase_c = 0x80162E90;
+	searchById__7fBase_cFUi = 0x80162E40;
+	searchByProfileId__7fBase_cFUsP7fBase_c = 0x80162E90;
 	searchByBaseType__7fBase_cFiP7fBase_c = 0x80162EF0;
 
 	AddStockPowerup = 0x800BB330;
@@ -295,7 +295,7 @@ SECTIONS {
 	stunPlayer = 0x80137650;
 	unstunPlayer = 0x80137790;
 
-	createChild__13dStageActor_cF6ActorsP13dStageActor_cUiP7Point3dP6S16VecUc = 0x80064680;
+	createChild__13dStageActor_cFUsP13dStageActor_cUiP7Point3dP6S16VecUc = 0x80064680;
 	GameMgrBossEndFunc = 0x8001CDB0;
 	MakeMarioEnterDemoMode = 0x807C7F50;
 	MakeMarioExitDemoMode = 0x8005CA50;
@@ -772,7 +772,7 @@ SECTIONS {
 	_vfD0__13dStageActor_cFP7Point2df = 0x80065EC0;
 	outOfZone__13dStageActor_cF7Point3dPfUc = 0x80064da0;
 	checkZoneBoundaries__13dStageActor_cFUi = 0x80064F50;
-	create__13dStageActor_cF6ActorsUiP7Point3dP6S16VecUc = 0x80064610;
+	create__13dStageActor_cFUsUiP7Point3dP6S16VecUc = 0x80064610;
 	Delete__13dStageActor_cFUc = 0x80064d10;
 
 	__ct__8dScene_cFv = 0x800E1AA0;
@@ -893,8 +893,6 @@ SECTIONS {
 	update__21dPlayerModelHandler_cFv = 0x800D6F80;
 	setMatrix__21dPlayerModelHandler_cFPA4_f = 0x800D6FA0;
 
-	_Z15FindActorByType6ActorsP5Actor = 0x80162E90;
-	FindActorByType__F6ActorsP5Actor = 0x80162E90;
 	_Z19RetrieveFileFromArcPvPcS0_ = 0x800DF270;
 	_Z8OSReportPKcz = 0x8015F870;
 	OSReport__FPCce = 0x8015F870;

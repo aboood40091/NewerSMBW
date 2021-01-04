@@ -1,6 +1,7 @@
 #include <game.h>
 #include <sfx.h>
 #include <dCourse.h>
+#include <profileid.h>
 #include <stage.h>
 #include <playeranim.h>
 #define GEKKO
@@ -668,7 +669,7 @@ void dCreditsMgr_c::exitStage() {
 	bool wasPreviouslyBeat = (save->bitfield & 2) != 0;
 	save->bitfield |= 2;
 
-	ExitStage(WORLD_MAP, wasPreviouslyBeat ? 0 : 0x20000000, BEAT_LEVEL, CIRCLE_WIPE);
+	ExitStage(ProfileId::WORLD_MAP, wasPreviouslyBeat ? 0 : 0x20000000, BEAT_LEVEL, CIRCLE_WIPE);
 }
 
 Vec2 dCreditsMgr_c::_vf70() {

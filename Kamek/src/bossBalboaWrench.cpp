@@ -1,9 +1,11 @@
 #include <common.h>
 #include <game.h>
 #include <g3dhax.h>
+#include <profileid.h>
 #include <sfx.h>
 #include <stage.h>
 #include "boss.h"
+extern "C" void dAcPy_vf3F8(void* player, dEn_c* monster, int t);
 
 class daBalboa_c : public daBoss {
 	int onCreate();
@@ -22,7 +24,7 @@ class daBalboa_c : public daBoss {
 	int damage;
 	float Baseline;
 	float dying;
-	Vec PopUp [3]; 
+	Vec PopUp [3];
 	char throwCount;
 	char throwMax;
 	float throwRate;
@@ -34,7 +36,7 @@ class daBalboa_c : public daBoss {
 	ActivePhysics spikeCollision;
 	float spikeOffset;
 	bool spikeGoingUp, spikeGoingDown;
-	
+
 	static daBalboa_c *build();
 
 	void setupModels();
@@ -52,7 +54,7 @@ class daBalboa_c : public daBoss {
 	bool collisionCatD_Drill(ActivePhysics *apThis, ActivePhysics *apOther);
 
 	void addScoreWhenHit(void *other);
-	
+
 	USING_STATES(daBalboa_c);
 	DECLARE_STATE(Grow);
 	DECLARE_STATE(ManholeUp);
@@ -85,11 +87,11 @@ daBalboa_c *daBalboa_c::build() {
 	CREATE_STATE(daBalboa_c, Revenge);
 
 // Collisions
-	void balbieCollisionCallback(ActivePhysics *apThis, ActivePhysics *apOther);	
+	void balbieCollisionCallback(ActivePhysics *apThis, ActivePhysics *apOther);
 
 	void balbieCollisionCallback(ActivePhysics *apThis, ActivePhysics *apOther) {
-		if (apOther->owner->name != 544) { 
-			dEn_c::collisionCallback(apThis, apOther); 
+		if (apOther->owner->profileId != ProfileId::EN_GAKE_NOKO) {
+			dEn_c::collisionCallback(apThis, apOther);
 		}
 	}
 
@@ -106,7 +108,7 @@ bool daBalboa_c::prePlayerCollision(ActivePhysics *apThis, ActivePhysics *apOthe
 	return dEn_c::prePlayerCollision(apThis, apOther);
 }
 
-	void daBalboa_c::playerCollision(ActivePhysics *apThis, ActivePhysics *apOther) { 
+	void daBalboa_c::playerCollision(ActivePhysics *apThis, ActivePhysics *apOther) {
 
 		char ret = usedForDeterminingStatePress_or_playerCollision(this, apThis, apOther, 0);
 
@@ -121,7 +123,7 @@ bool daBalboa_c::prePlayerCollision(ActivePhysics *apThis, ActivePhysics *apOthe
 		this->counter_504[apOther->owner->which_player] = 0;
 	}
 
-	bool daBalboa_c::collisionCat7_GroundPound(ActivePhysics *apThis, ActivePhysics *apOther) { 
+	bool daBalboa_c::collisionCat7_GroundPound(ActivePhysics *apThis, ActivePhysics *apOther) {
 
 		dActor_c *block = apOther->owner;
 		dEn_c *mario = (dEn_c*)block;
@@ -133,7 +135,7 @@ bool daBalboa_c::prePlayerCollision(ActivePhysics *apThis, ActivePhysics *apOthe
 
 		if (mario->direction == 0) { mario->speed.x = 4.0; }
 		else					  { mario->speed.x = -4.0; }
-		
+
 		mario->doSpriteMovement();
 		mario->doSpriteMovement();
 
@@ -141,17 +143,17 @@ bool daBalboa_c::prePlayerCollision(ActivePhysics *apThis, ActivePhysics *apOthe
 			_vf220(apOther->owner);
 		} else {
 			this->damage -= 1;
-			
+
 			apOther->someFlagByte |= 2;
-			
-			PlaySoundAsync(this, SE_EMY_PENGUIN_DAMAGE);			
+
+			PlaySoundAsync(this, SE_EMY_PENGUIN_DAMAGE);
 
 			doStateChange(&StateID_Damage);
 		}
 
 		return true;
 	}
-	bool daBalboa_c::collisionCatD_Drill(ActivePhysics *apThis, ActivePhysics *apOther) { 
+	bool daBalboa_c::collisionCatD_Drill(ActivePhysics *apThis, ActivePhysics *apOther) {
 		return collisionCat7_GroundPound(apThis, apOther);
 	}
 
@@ -203,7 +205,7 @@ void daBalboa_c::setupModels() {
 	allocator.unlink();
 }
 
-// Animation Order... 
+// Animation Order...
 // AppearLittle - Throw One, sound 0x21F
 // Search - Throw two
 // AppearFull - Throw 3 and sound 0x220
@@ -297,15 +299,15 @@ int daBalboa_c::onExecute() {
 		}
 	}
 	spikeCollision.info.yDistToCenter = 16.0f + spikeOffset;
-	
+
 	bodyModel._vf1C();
-		
+
 	return true;
 }
 
 int daBalboa_c::onDraw() {
-	
-	bodyModel.scheduleForDrawing(); 
+
+	bodyModel.scheduleForDrawing();
 	if (spikeOffset > 0.0f)
 		spikesModel.scheduleForDrawing();
 
@@ -319,7 +321,7 @@ void daBalboa_c::updateModelMatrices() {
 
 	bodyModel.setDrawMatrix(matrix);
 	bodyModel.setScale(&scale);
-	bodyModel.calcWorld(false); 
+	bodyModel.calcWorld(false);
 
 	mMtx spikeMatrix;
 	VEC3 spikeScale = {2.0f,1.8f,2.0f};
@@ -331,69 +333,69 @@ void daBalboa_c::updateModelMatrices() {
 
 // Grow State
 
-	void daBalboa_c::beginState_Grow() { 
+	void daBalboa_c::beginState_Grow() {
 		this->timer = 0;
 
 		SetupKameck(this, Kameck);
 
-		bindAnimChr_and_setUpdateRate("begin_boss", 1, 0.0, 0.6); 
+		bindAnimChr_and_setUpdateRate("begin_boss", 1, 0.0, 0.6);
 	}
 
-	void daBalboa_c::executeState_Grow() { 
+	void daBalboa_c::executeState_Grow() {
 
 		if(this->animationChr.isAnimationDone())
 			this->animationChr.setCurrentFrame(0.0);
 
 		this->timer += 1;
-		
+
 		bool ret;
 		ret = GrowBoss(this, Kameck, 1.0, 2.25, 0, this->timer);
 
-		if (ret) { 	
+		if (ret) {
 			PlaySound(this, SE_EMY_CHOROPU_BOUND);
-			doStateChange(&StateID_BackDown); 
+			doStateChange(&StateID_BackDown);
 		}
 	}
-	void daBalboa_c::endState_Grow() { 
+	void daBalboa_c::endState_Grow() {
 		CleanupKameck(this, Kameck);
 	}
 
 
 // ManholeUp State
 
-	void daBalboa_c::beginState_ManholeUp() { 
+	void daBalboa_c::beginState_ManholeUp() {
 
-		bindAnimChr_and_setUpdateRate("throw_1", 1, 0.0, 1.0); 
+		bindAnimChr_and_setUpdateRate("throw_1", 1, 0.0, 1.0);
 
 		this->timer = 0;
-			
+
 		int randChoice;
 		randChoice = GenerateRandomNumber(3);
-		
+
 		this->pos = this->PopUp[randChoice];
 
 
-		
+
 		if 		(randChoice == 0) { // On the left side!
-			this->rot.y = 0xE000; 
+			this->rot.y = 0xE000;
 			this->rot.z = 0;
 			this->upsideDown = 0;
 			this->direction = 0; }
 
 		else if (randChoice == 1) {	// On the right side!
-			this->rot.y = 0x2000; 
+			this->rot.y = 0x2000;
 			this->rot.z = 0;
 			this->upsideDown = 0;
 			this->direction = 1; }
 
 		// else if (randChoice == 2) {	// On the right ceiling!
-		// 	this->rot.y = 0xE000; 
+		// 	this->rot.y = 0xE000;
 		// 	this->rot.z = 0x8000;
 		// 	this->upsideDown = 1;
 		// 	this->direction = 0; }
 
 		// else if (randChoice == 3) {	// On the left ceiling!
-		// 	this->rot.y = 0x2000; 
+		// 	this->rot.y = 0x2000;
 		// 	this->rot.z = 0x8000;
 		// 	this->upsideDown = 1;
 		// 	this->direction = 1; }
@@ -402,44 +404,44 @@ void daBalboa_c::updateModelMatrices() {
 			char Pdir = dSprite_c__getXDirectionOfFurthestPlayerRelativeToVEC3(this, this->pos);
 
 			if (Pdir == 1) {
-				this->rot.y = 0xE000; 
+				this->rot.y = 0xE000;
 				this->direction = 0; }
 			else {
-				this->rot.y = 0x2000; 
+				this->rot.y = 0x2000;
 				this->direction = 1; }
 		}
 
 		PlaySound(this, 0x21F);
 	}
 
-	void daBalboa_c::executeState_ManholeUp() { 
+	void daBalboa_c::executeState_ManholeUp() {
 
 		if (this->timer > 51) {
-			doStateChange(&StateID_HeadPoke); 
+			doStateChange(&StateID_HeadPoke);
 		}
 		if (this->timer > 11) { }
-		else {	
+		else {
 			this->pos.y += 0.8182; // Height is 54 pixels, move up 9 pixels.
 		}
-			
-		this->timer += 1;		
+
+		this->timer += 1;
 	}
 	void daBalboa_c::endState_ManholeUp() { }
 
 
 // HeadPoke State
 
-	void daBalboa_c::beginState_HeadPoke() { 
+	void daBalboa_c::beginState_HeadPoke() {
 
-		bindAnimChr_and_setUpdateRate("throw_2", 1, 0.0, 1.0); 
+		bindAnimChr_and_setUpdateRate("throw_2", 1, 0.0, 1.0);
 
 		this->timer = 0;
 	}
 
-	void daBalboa_c::executeState_HeadPoke() { 
+	void daBalboa_c::executeState_HeadPoke() {
 
 		this->pos.y += 0.24; // Height is 54 pixels, move up 18 pixels.
-				
+
 		if(this->animationChr.isAnimationDone()) {
 			doStateChange(&StateID_AllOut); }
 
@@ -449,22 +451,22 @@ void daBalboa_c::updateModelMatrices() {
 
 // AllOut State
 
-	void daBalboa_c::beginState_AllOut() { 
+	void daBalboa_c::beginState_AllOut() {
 
-		bindAnimChr_and_setUpdateRate("throw_3", 1, 0.0, 1.0); 
+		bindAnimChr_and_setUpdateRate("throw_3", 1, 0.0, 1.0);
 
 		this->timer = 0;
 
 		PlaySound(this, 0x220);
 	}
 
-	void daBalboa_c::executeState_AllOut() { 
+	void daBalboa_c::executeState_AllOut() {
 
 
 		this->pos.y += 0.8182; // Height is 54 pixels, move up 27 pixels.
-				
+
 		if(this->animationChr.isAnimationDone()) {
-			doStateChange(&StateID_ThrowWrench); 
+			doStateChange(&StateID_ThrowWrench);
 		}
 	}
 	void daBalboa_c::endState_AllOut() { }
@@ -472,7 +474,7 @@ void daBalboa_c::updateModelMatrices() {
 
 // ThrowWrench State
 
-	void daBalboa_c::beginState_ThrowWrench() { 
+	void daBalboa_c::beginState_ThrowWrench() {
 
 		this->throwCount = 0;
 		if (this->isBigBoss == 1) {
@@ -486,7 +488,7 @@ void daBalboa_c::updateModelMatrices() {
 		bindAnimChr_and_setUpdateRate("throw_4_right_hand", 1, 0.0, throwRate);
 	}
 
-	void daBalboa_c::executeState_ThrowWrench() { 
+	void daBalboa_c::executeState_ThrowWrench() {
 
 		float frame = this->animationChr.getCurrentFrame();
 		if (frame == 54.0) {
@@ -494,7 +496,7 @@ void daBalboa_c::updateModelMatrices() {
 			u8 up = this->upsideDown;
 			u8 throwc = this->throwCount;
 			u8 dir;
-			
+
 			if (this->direction) { dir = 0; }
 			else 				 { dir = 1; }
 
@@ -503,31 +505,31 @@ void daBalboa_c::updateModelMatrices() {
 
 			if (this->isBigBoss == 1) { settings = settings | 0x10; }
 
-			CreateActor(544, settings, this->pos, 0, 0);
+			CreateActor(ProfileId::EN_GAKE_NOKO, settings, this->pos, 0, 0);
 		}
 
-		if(this->animationChr.isAnimationDone()) { 
+		if(this->animationChr.isAnimationDone()) {
 			this->throwCount += 1;
 
 			if (this->throwCount & 1) {
-				bindAnimChr_and_setUpdateRate("throw_4_left_hand", 1, 0.0, throwRate); 
+				bindAnimChr_and_setUpdateRate("throw_4_left_hand", 1, 0.0, throwRate);
 			}
 			else {
-				bindAnimChr_and_setUpdateRate("throw_4_right_hand", 1, 0.0, throwRate); 
+				bindAnimChr_and_setUpdateRate("throw_4_right_hand", 1, 0.0, throwRate);
 			}
 		}
-		
+
 		if (this->throwCount > throwMax) {
-			doStateChange(&StateID_BackDown); }		
+			doStateChange(&StateID_BackDown); }
 	}
 	void daBalboa_c::endState_ThrowWrench() { }
 
 
 // BackDown State
 
-	void daBalboa_c::beginState_BackDown() { 
+	void daBalboa_c::beginState_BackDown() {
 
-		bindAnimChr_and_setUpdateRate("throw_5", 1, 0.0, 1.0); 
+		bindAnimChr_and_setUpdateRate("throw_5", 1, 0.0, 1.0);
 
 		this->timer = 0;
 
@@ -537,26 +539,26 @@ void daBalboa_c::updateModelMatrices() {
 		SpawnEffect("Wm_mr_sanddive_smk", 0, &this->pos, &(S16Vec){0,0,0}, &(Vec){2.0, 1.0, 1.0});
 	}
 
-	void daBalboa_c::executeState_BackDown() { 
+	void daBalboa_c::executeState_BackDown() {
 
 		if (this->timer < 60) {
-			this->pos.y -= 2.0;  // Height is 54 pixels, move down 
+			this->pos.y -= 2.0;  // Height is 54 pixels, move down
 		}
-			
+
 		if (this->timer > 90) {
 			doStateChange(&StateID_ManholeUp); }
-			
+
 		this->timer += 1;
 
 	}
 	void daBalboa_c::endState_BackDown() { }
 
 
-// Outro 
+// Outro
 
-	void daBalboa_c::beginState_Outro() { 
+	void daBalboa_c::beginState_Outro() {
 
-		bindAnimChr_and_setUpdateRate("dead", 1, 0.0, 1.0); 
+		bindAnimChr_and_setUpdateRate("dead", 1, 0.0, 1.0);
 
 		OutroSetup(this);
 		this->timer = 0;
@@ -569,25 +571,25 @@ void daBalboa_c::updateModelMatrices() {
 		if(this->animationChr.isAnimationDone())
 			this->animationChr.setCurrentFrame(0.0);
 
-		if (this->dying == 1) { 
-			if (this->timer > 180) { ExitStage(WORLD_MAP, 0, BEAT_LEVEL, MARIO_WIPE); }
-			if (this->timer == 60) { PlayerVictoryCries(this); }	
-			
+		if (this->dying == 1) {
+			if (this->timer > 180) { ExitStage(ProfileId::WORLD_MAP, 0, BEAT_LEVEL, MARIO_WIPE); }
+			if (this->timer == 60) { PlayerVictoryCries(this); }
+
 			this->timer += 1;
-			return; 
-		}	
+			return;
+		}
 
 		bool ret;
 		ret = ShrinkBoss(this, &this->pos, 2.25, this->timer);
 		this->pos.y -= 0.02;
 
-		if (ret == true) 	{ 
-			BossExplode(this, &this->pos); 
+		if (ret == true) 	{
+			BossExplode(this, &this->pos);
 			this->dying = 1;
-			this->timer = 0;	
+			this->timer = 0;
 		}
 		else 		{ PlaySound(this, SE_EMY_CHOROPU_SIGN); }
-	
+
 		this->timer += 1;
 
 	}
@@ -596,9 +598,9 @@ void daBalboa_c::updateModelMatrices() {
 
 // Damage
 
-	void daBalboa_c::beginState_Damage() { 
-		
-		bindAnimChr_and_setUpdateRate("dead", 1, 0.0, 0.5); 
+	void daBalboa_c::beginState_Damage() {
+
+		bindAnimChr_and_setUpdateRate("dead", 1, 0.0, 0.5);
 
 		this->timer = 0;
 		this->removeMyActivePhysics();
@@ -607,47 +609,47 @@ void daBalboa_c::updateModelMatrices() {
 
 		if (this->timer > 6) { doStateChange(&StateID_RevengeUp); }
 
-		if(this->animationChr.isAnimationDone()) { 
+		if(this->animationChr.isAnimationDone()) {
 			this->animationChr.setCurrentFrame(0.0);
 
 			this->timer += 1;
 		}
 
 		if (this->timer > 3) {
-			this->pos.y -= 5.0; // Height is 54 pixels, move down 
+			this->pos.y -= 5.0; // Height is 54 pixels, move down
 		}
 		else if (this->timer > 2) {
-			if (this->damage == 0) { 
+			if (this->damage == 0) {
 				StopBGMMusic();
-				doStateChange(&StateID_Outro); 
+				doStateChange(&StateID_Outro);
 			}
-			this->pos.y -= 3.5; // Height is 54 pixels, move down 
+			this->pos.y -= 3.5; // Height is 54 pixels, move down
 		}
 		else if (this->timer > 1) {
-			this->pos.y -= 1.0; // Height is 54 pixels, move down 
+			this->pos.y -= 1.0; // Height is 54 pixels, move down
 		}
 		else if (this->timer > 0) {
-			this->pos.y += 1.0; // Height is 54 pixels, move down 
+			this->pos.y += 1.0; // Height is 54 pixels, move down
 		}
 		else {
-			this->pos.y += 3.5; // Height is 54 pixels, move down 
+			this->pos.y += 3.5; // Height is 54 pixels, move down
 		}
 
 	}
-	void daBalboa_c::endState_Damage() { 
+	void daBalboa_c::endState_Damage() {
 		this->addMyActivePhysics();
 	}
 
 
 // Revenge Up
 
-	void daBalboa_c::beginState_RevengeUp() { 
+	void daBalboa_c::beginState_RevengeUp() {
 
 		this->pos = this->PopUp[2];
 		this->rot.y = 0;
-		
+
 		isRevenging = 1;
-		bindAnimChr_and_setUpdateRate("throw_3", 1, 0.0, 1.0); 
+		bindAnimChr_and_setUpdateRate("throw_3", 1, 0.0, 1.0);
 		spikeGoingUp = true;
 		spikeCollision.addToList();
 
@@ -656,9 +658,9 @@ void daBalboa_c::updateModelMatrices() {
 	void daBalboa_c::executeState_RevengeUp() {
 
 		this->pos.y += 1.6363; // Height is 54 pixels, move up 27 pixels.
-				
+
 		if(this->animationChr.isAnimationDone()) {
-			doStateChange(&StateID_Revenge); 
+			doStateChange(&StateID_Revenge);
 		}
 
 	}
@@ -667,7 +669,7 @@ void daBalboa_c::updateModelMatrices() {
 
 // Revenge
 
-	void daBalboa_c::beginState_Revenge() { 
+	void daBalboa_c::beginState_Revenge() {
 		spinner = 0;
 
 		this->throwCount = 0;
@@ -692,7 +694,7 @@ void daBalboa_c::updateModelMatrices() {
 			u8 up = this->upsideDown;
 			u8 throwc = this->throwCount;
 			u8 dir;
-			
+
 			if (spinner < 2)	 { dir = 0; }
 			else 				 { dir = 1; }
 
@@ -701,27 +703,27 @@ void daBalboa_c::updateModelMatrices() {
 
 			if (this->isBigBoss == 1) { settings = settings | 0x10; }
 
-			CreateActor(544, settings, this->pos, 0, 0);
+			CreateActor(ProfileId::EN_GAKE_NOKO, settings, this->pos, 0, 0);
 		}
 
-		if(this->animationChr.isAnimationDone()) { 
+		if(this->animationChr.isAnimationDone()) {
 			this->throwCount += 1;
 			spinner += 1;
 			if (spinner == 4) { spinner = 0; }
 
 			if (this->throwCount & 1) {
-				bindAnimChr_and_setUpdateRate("throw_4_left_hand", 1, 0.0, throwRate); 
+				bindAnimChr_and_setUpdateRate("throw_4_left_hand", 1, 0.0, throwRate);
 			}
 			else {
-				bindAnimChr_and_setUpdateRate("throw_4_right_hand", 1, 0.0, throwRate); 
+				bindAnimChr_and_setUpdateRate("throw_4_right_hand", 1, 0.0, throwRate);
 			}
 		}
-		
+
 		if (this->throwCount > throwMax) {
 			doStateChange(&StateID_BackDown); }
 
 	}
-	void daBalboa_c::endState_Revenge() { 
+	void daBalboa_c::endState_Revenge() {
 			isRevenging = 0;
 			spikeGoingDown = true;
 			spikeCollision.removeFromList();

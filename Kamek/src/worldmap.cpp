@@ -1,4 +1,5 @@
 #include "worldmap.h"
+#include <profileid.h>
 
 extern "C" void LoadMapScene();
 
@@ -274,16 +275,16 @@ int dScNewerWorldMap_c::onCreate() {
 	}
 
 
-	this->selectCursor = CreateParentedObject(SELECT_CURSOR, this, 0, 0);
-	this->csMenu = CreateParentedObject(COURSE_SELECT_MENU, this, 0, 0);
-	this->yesNoWindow = CreateParentedObject(YES_NO_WINDOW, this, 0, 0);
-	this->numPeopleChange = CreateParentedObject(NUMBER_OF_PEOPLE_CHANGE, this, 0, 0);
+	this->selectCursor = CreateParentedObject(ProfileId::SELECT_CURSOR, this, 0, 0);
+	this->csMenu = CreateParentedObject(ProfileId::COURSE_SELECT_MENU, this, 0, 0);
+	this->yesNoWindow = CreateParentedObject(ProfileId::YES_NO_WINDOW, this, 0, 0);
+	this->numPeopleChange = CreateParentedObject(ProfileId::NUMBER_OF_PEOPLE_CHANGE, this, 0, 0);
 
 	for (int i = 0; i < 4; i++) {
-		void *ccsb = CreateParentedObject(CHARACTER_CHANGE_SELECT_BASE, this, i, 0);
-		void *ccsc = CreateParentedObject(CHARACTER_CHANGE_SELECT_CONTENTS, this, i, 0);
-		void *ccsa = CreateParentedObject(CHARACTER_CHANGE_SELECT_ARROW, this, i, 0);
-		void *cci = CreateParentedObject(CHARACTER_CHANGE_INDICATOR, this, i, 0);
+		void *ccsb = CreateParentedObject(ProfileId::CHARACTER_CHANGE_SELECT_BASE, this, i, 0);
+		void *ccsc = CreateParentedObject(ProfileId::CHARACTER_CHANGE_SELECT_CONTENTS, this, i, 0);
+		void *ccsa = CreateParentedObject(ProfileId::CHARACTER_CHANGE_SELECT_ARROW, this, i, 0);
+		void *cci = CreateParentedObject(ProfileId::CHARACTER_CHANGE_INDICATOR, this, i, 0);
 
 		NPCHG_CCSB(this->numPeopleChange, i) = ccsb;
 		NPCHG_CCSC(this->numPeopleChange, i) = ccsc;
@@ -291,13 +292,13 @@ int dScNewerWorldMap_c::onCreate() {
 		NPCHG_CCI(this->numPeopleChange, i) = cci;
 	}
 
-	this->continueObj = CreateParentedObject(CONTINUE, this, 0, 0);
+	this->continueObj = CreateParentedObject(ProfileId::CONTINUE, this, 0, 0);
 
-	this->stockItem = CreateParentedObject(STOCK_ITEM, this, 0, 0);
-	this->stockItemShadow = CreateParentedObject(STOCK_ITEM_SHADOW, this, 0, 0);
+	this->stockItem = CreateParentedObject(ProfileId::STOCK_ITEM, this, 0, 0);
+	this->stockItemShadow = CreateParentedObject(ProfileId::STOCK_ITEM_SHADOW, this, 0, 0);
 	STKI_SHADOW(this->stockItem) = this->stockItemShadow;
 
-	this->easyPairing = CreateParentedObject(EASY_PAIRING, this, 0, 0);
+	this->easyPairing = CreateParentedObject(ProfileId::EASY_PAIRING, this, 0, 0);
 
 	this->state = STATE_START_DVD;
 
@@ -431,14 +432,14 @@ int dScNewerWorldMap_c::onExecute() {
 
 				// first up: player models for Stocked Items
 				for (int i = 0; i < 4; i++) {
-					void *obj = CreateChildObject(WM_2D_PLAYER, this, i, 0, 0);
+					void *obj = CreateChildObject(ProfileId::WM_2D_PLAYER, this, i, 0, 0);
 					STKI_2DPLAYER(this->stockItem,i) = obj;
 					NPCHG_2DPLAYER(this->numPeopleChange,i) = obj;
 				}
 
 				// next: items for the Powerup screen
 				for (int i = 0; i < 7; i++) {
-					void *obj = CreateChildObject(WM_ITEM, this, i, 0, 0);
+					void *obj = CreateChildObject(ProfileId::WM_ITEM, this, i, 0, 0);
 					STKI_ITEM(this->stockItem,i) = obj;
 				}
 
